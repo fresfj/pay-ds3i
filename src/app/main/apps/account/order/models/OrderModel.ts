@@ -1,6 +1,6 @@
 import _ from '@lodash'
 import { PartialDeep } from 'type-fest'
-import { EcommerceOrder } from '../../ECommerceApi'
+import { EcommerceOrder } from '../../../e-commerce/ECommerceApi'
 
 /**
  * The order model.

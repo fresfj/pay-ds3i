@@ -8,9 +8,8 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { memo } from 'react';
-import { EcommerceOrder } from '../../ECommerceApi';
-import Box from '@mui/material/Box';
-import FuseUtils from '@fuse/utils/FuseUtils';
+import { EcommerceOrder } from '../../../e-commerce/ECommerceApi';
+
 
 const Root = styled('div')(({ theme }) => ({
 	'& table ': {

@@ -1,6 +1,7 @@
 import _ from '@lodash';
 import clsx from 'clsx';
-import { EcommerceOrder } from '../ECommerceApi';
+import { EcommerceOrder } from '../../e-commerce/ECommerceApi';
+
 
 /**
  * The payment statuses.
