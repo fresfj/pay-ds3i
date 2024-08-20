@@ -1,0 +1,18 @@
+{
+  "short_name": "Creabox Clube",
+  "name": "Creabox Clube",
+  "description": "O Único Clube de Assinatura de Creatina e Benefícios do Brasil",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ],
+  "lang": "pt-BR",
+  "start_url": "./index.html",
+  "scope": "./index.html",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}

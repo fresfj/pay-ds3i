@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<url>
+  <loc>https://payment.creabox.com.br/checkout/1c32e334</loc>
+  <lastmod>2024-04-12T00:02:42+00:00</lastmod>
+  <changefreq>daily</changefreq>
+       <priority>0.8000</priority>
+</url>
+<url>
+  <loc>https://payment.creabox.com.br/checkout/27c543b2</loc>
+  <lastmod>2024-04-12T00:02:42+00:00</lastmod>
+  <changefreq>daily</changefreq>
+       <priority>0.8000</priority>
+</url>
+<url>
+  <loc>https://payment.creabox.com.br/checkout/0d8b29f4</loc>
+  <lastmod>2024-04-12T00:02:42+00:00</lastmod>
+  <changefreq>daily</changefreq>
+       <priority>0.8000</priority>
+</url>
+<url>
+  <loc>https://payment.creabox.com.br/</loc>
+  <lastmod>2024-04-12T00:02:42+00:00</lastmod>
+  <changefreq>daily</changefreq>
+       <priority>0.8000</priority>
+</url>
+<url>
+  <loc>https://lp.creabox.com.br/</loc>
+  <lastmod>2024-04-12T00:02:42+00:00</lastmod>
+  <changefreq>daily</changefreq>
+       <priority>0.8000</priority>
+</url>
+<url>
+  <loc>https://creabox.com.br/</loc>
+  <lastmod>2024-04-12T00:02:42+00:00</lastmod>
+  <changefreq>daily</changefreq>
+       <priority>0.8000</priority>
+</url>
+</urlset>
