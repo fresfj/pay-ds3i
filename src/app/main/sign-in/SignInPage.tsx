@@ -53,15 +53,15 @@ function SignInPage() {
 					<Typography className="mt-32 text-4xl font-extrabold leading-tight tracking-tight">
 						Acesso ao Club
 					</Typography>
-					{/* <div className="mt-2 flex items-baseline font-medium">
-						<Typography>Don't have an account?</Typography>
+					<div className="mt-2 flex items-baseline font-medium">
+						<Typography>Não tenho uma conta?</Typography>
 						<Link
 							className="ml-4"
 							to="/sign-up"
 						>
-							Sign up
+							Cadastrar-se
 						</Link>
-					</div> */}
+					</div>
 					<FirebaseSignInTab />
 				</CardContent>
 			</Paper>

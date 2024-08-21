@@ -132,7 +132,7 @@ function ToolbarLayout1(props: ToolbarLayout1Props) {
 				sx={{
 					backgroundColor: (theme) =>
 						theme.palette.mode === 'light'
-							? toolbarTheme.palette.background.paper
+							? 'transparent !important'
 							: toolbarTheme.palette.background.default,
 					zIndex: 'var(--layout-header-zIndex)'
 				}}

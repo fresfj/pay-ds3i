@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 
 import Box from '@mui/material/Box';
@@ -21,6 +21,15 @@ import ProductLabel from 'src/app/main/apps/shop/components/MailLabel';
 import { ColorPicker } from '@fuse/components/color-utils';
 import TextField from '@mui/material/TextField';
 import { availableSizes } from 'src/app/main/apps/e-commerce/product/tabs/VariantsTab';
+import { calculateDiscountPercentage } from '../products/ProductItem';
+import PopupState, { bindMenu, bindTrigger } from 'material-ui-popup-state';
+import Menu from '@mui/material/Menu';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import { Link as RouterLink } from 'react-router-dom';
+import { useCopyToClipboard } from '@fuse/hooks/use-copy-to-clipboard';
+import { showMessage } from '@fuse/core/FuseMessage/store/fuseMessageSlice';
+import Checkbox from '@mui/material/Checkbox';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 
 // ----------------------------------------------------------------------
@@ -93,12 +102,66 @@ export function ProductDetailsSummary({
   const dispatch = useAppDispatch();
   const values = watch();
 
+  const { copy } = useCopyToClipboard();
+
   useEffect(() => {
     if (product) {
       reset(defaultValues);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product]);
+  const fullURL = window.location.href;
+  const [favorites, setFavorites] = useState([]);
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  useEffect(() => {
+    const storedFavorites = JSON.parse(localStorage.getItem('favorites')) || [];
+    setFavorites(storedFavorites);
+    setIsFavorite(storedFavorites.includes(product.id));
+  }, [product.id]);
+
+  const handleToggleFavorite = () => {
+    let updatedFavorites;
+
+    if (isFavorite) {
+      updatedFavorites = favorites.filter(id => id !== product.id);
+    } else {
+      updatedFavorites = [...favorites, product.id];
+    }
+
+    setFavorites(updatedFavorites);
+    setIsFavorite(!isFavorite);
+    localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+  };
+
+  const handleSendEmail = useCallback(
+    () => {
+      const subject = 'Olha que produto incrível';
+      const body = `Olha que produto incrível: ${fullURL}`;
+      const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.location.href = mailtoLink;
+
+    }, []
+  );
+
+
+  const onCopy = useCallback(
+    () => {
+      dispatch(
+        showMessage({
+          message: 'Copied!',
+          autoHideDuration: 6000,
+          anchorOrigin: {
+            vertical: 'top',
+            horizontal: 'right'
+          },
+          variant: 'success'
+        }))
+      copy(fullURL);
+
+    },
+    [copy]
+  );
 
   const onSubmit = handleSubmit(async (data) => {
     // try {
@@ -138,47 +201,70 @@ export function ProductDetailsSummary({
 
   const stockStatus = getStockStatus(quantity);
   const inventoryType = stockStatus?.value || 'IN_STOCK';
+  const discountPercentage = calculateDiscountPercentage(comparedPrice, priceTaxIncl);
 
   const renderPrice = (
-    <Box sx={{ typography: 'h5' }}>
+    <Box sx={{ typography: 'h5' }} className='font-semibold'>
       {priceTaxIncl && (
         <Box
-          component="span"
-          sx={{ color: 'text.disabled', textDecoration: 'line-through', mr: 0.5 }}
+          component="small"
+          sx={{ color: 'text.disabled', textDecoration: 'line-through', textDecorationColor: 'rgb(255 72 66 / 70%)', mr: 0.5 }}
         >
           {FuseUtils.formatCurrency(comparedPrice)}
         </Box>
       )}
 
       {FuseUtils.formatCurrency(priceTaxIncl)}
+
+      {priceTaxIncl < comparedPrice && (
+        <Box sx={{ ml: 0.5 }} component="small" color="success.main">
+          {`(-${discountPercentage}%)`}
+        </Box>
+      )}
     </Box>
   );
 
   const renderShare = (
     <Stack direction="row" spacing={3} justifyContent="center">
-      <Link
-        variant="subtitle2"
-        sx={{ color: 'text.secondary', display: 'inline-flex', alignItems: 'center' }}
-      >
-        <Iconify icon="mingcute:add-line" width={16} sx={{ mr: 1 }} />
-        Compare
-      </Link>
+      <FormControlLabel
+        control={
+          <Checkbox
+            size="small"
+            color="error"
+            checked={isFavorite}
+            onChange={handleToggleFavorite}
+            icon={<Iconify icon="solar:heart-bold" />}
+            checkedIcon={<Iconify icon="solar:heart-bold" />}
+            inputProps={{ id: 'favorite-checkbox', 'aria-label': 'Favorite checkbox' }}
+          />
+        }
+        label={(
+          <Typography variant="subtitle2" sx={{ px: 0.5, color: 'text.primary' }}>
+            {isFavorite ? 'Desfavoritar' : 'Favoritar'}
+          </Typography>
+        )}
+        sx={{ mr: 1 }}
+      />
 
-      <Link
-        variant="subtitle2"
-        sx={{ color: 'text.secondary', display: 'inline-flex', alignItems: 'center' }}
-      >
-        <Iconify icon="solar:heart-bold" width={16} sx={{ mr: 1 }} />
-        Favorite
-      </Link>
-
-      <Link
-        variant="subtitle2"
-        sx={{ color: 'text.secondary', display: 'inline-flex', alignItems: 'center' }}
-      >
-        <Iconify icon="solar:share-bold" width={16} sx={{ mr: 1 }} />
-        Share
-      </Link>
+      <PopupState variant="popover" popupId="demo-popup-menu">
+        {(popupState) => (
+          <>
+            <Link
+              variant="subtitle2"
+              sx={{ color: 'text.secondary', display: 'inline-flex', alignItems: 'center' }}
+              {...bindTrigger(popupState)}
+            >
+              <Iconify icon="solar:share-bold" width={18} sx={{ mr: 1 }} />
+              Compartilhar
+            </Link>
+            <Menu {...bindMenu(popupState)}>
+              <MenuItem component={RouterLink} to="https://api.whatsapp.com/send/?text=Olha+que+produto+incr%C3%ADvel+https%3A%2F%2Floja.ds3i.com.br&type=custom_url&app_absent=0"><ListItemIcon><Iconify icon="uil:whatsapp" /></ListItemIcon>Whatsapp</MenuItem>
+              <MenuItem onClick={() => { handleSendEmail(); popupState.close(); }}><ListItemIcon><Iconify icon="eva:email-outline" /></ListItemIcon>E-mail</MenuItem>
+              <MenuItem onClick={() => { onCopy(); popupState.close(); }}><ListItemIcon><Iconify icon="eva:copy-fill" /></ListItemIcon>Copiar link</MenuItem>
+            </Menu>
+          </>
+        )}
+      </PopupState>
     </Stack>
   );
 
@@ -305,11 +391,12 @@ export function ProductDetailsSummary({
         startIcon={<Iconify icon="solar:cart-plus-bold" width={24} />}
         onClick={handleAddCart}
         sx={{ whiteSpace: 'nowrap', px: 4 }}
+        className='hover:scale-105 transition duration-300 delay-150 ease-in-out'
       >
         {t('ADD_TO_CART')}
       </Button>
 
-      <Button fullWidth size="large" type="submit" variant="contained" disabled={disableActions}>
+      <Button fullWidth className='hover:scale-105 transition duration-300 delay-150 ease-in-out' size="large" type="submit" variant="contained" disabled={disableActions}>
         {t('BUY_NOW')}
       </Button>
     </Stack>
@@ -323,8 +410,8 @@ export function ProductDetailsSummary({
 
   const renderRating = (
     <Stack direction="row" alignItems="center" sx={{ color: 'text.disabled', typography: 'body2' }}>
-      <Rating size="small" value={totalRatings} precision={0.1} readOnly sx={{ mr: 1 }} />
-      {/* {`(${fShortenNumber(totalReviews)} reviews)`} */}
+      <Rating size="small" defaultValue={5} precision={0.5} readOnly sx={{ mr: 1 }} />
+      {`(3.36k comentários)`}
     </Stack>
   );
 
@@ -338,6 +425,7 @@ export function ProductDetailsSummary({
 
   const renderInventoryType = (
     <Box
+      className='font-semibold'
       component="span"
       sx={{
         typography: 'overline',
@@ -359,9 +447,9 @@ export function ProductDetailsSummary({
 
           {renderInventoryType}
 
-          <Typography variant="h5">{name}</Typography>
+          <Typography variant="h5" className='font-semibold'>{name}</Typography>
 
-          {/* {renderRating} */}
+          {renderRating}
 
           {renderPrice}
 
@@ -380,7 +468,7 @@ export function ProductDetailsSummary({
 
         {renderActions}
 
-        {/* {renderShare} */}
+        {renderShare}
       </Stack>
     </form>
   );

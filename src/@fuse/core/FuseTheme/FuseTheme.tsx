@@ -28,13 +28,13 @@ const inputGlobalStyles = (
 			},
 
 			/*  'code:not([class*="language-"])': {
-        color: theme.palette.secondary.dark,
-        backgroundColor:
-          theme.palette.mode === 'light' ? 'rgba(255, 255, 255, .9)' : 'rgba(0, 0, 0, .9)',
-        padding: '2px 3px',
-        borderRadius: 2,
-        lineHeight: 1.7,
-      }, */
+				color: theme.palette.secondary.dark,
+				backgroundColor:
+					theme.palette.mode === 'light' ? 'rgba(255, 255, 255, .9)' : 'rgba(0, 0, 0, .9)',
+				padding: '2px 3px',
+				borderRadius: 2,
+				lineHeight: 1.7,
+			}, */
 			'table.simple tbody tr th': {
 				borderColor: theme.palette.divider
 			},
@@ -42,9 +42,11 @@ const inputGlobalStyles = (
 				borderColor: theme.palette.divider
 			},
 			'a:not([role=button]):not(.MuiButtonBase-root)': {
-				color: theme.palette.secondary.main,
-				textDecoration: 'underline',
-				'&:hover': {}
+				color: theme.palette.primary.main,
+				textDecoration: 'none',
+				'&:hover': {
+					textDecoration: 'underline'
+				}
 			},
 			'a.link, a:not([role=button])[target=_blank]': {
 				background: alpha(theme.palette.secondary.main, 0.2),
@@ -70,14 +72,12 @@ const inputGlobalStyles = (
 			},
 
 			'::-webkit-scrollbar-thumb': {
-				boxShadow: `inset 0 0 0 20px ${
-					theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.24)' : 'rgba(255, 255, 255, 0.24)'
-				}`
+				boxShadow: `inset 0 0 0 20px ${theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.24)' : 'rgba(255, 255, 255, 0.24)'
+					}`
 			},
 			'::-webkit-scrollbar-thumb:active': {
-				boxShadow: `inset 0 0 0 20px ${
-					theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.37)' : 'rgba(255, 255, 255, 0.37)'
-				}`
+				boxShadow: `inset 0 0 0 20px ${theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.37)' : 'rgba(255, 255, 255, 0.37)'
+					}`
 			}
 		})}
 	/>

@@ -19,6 +19,7 @@ import NoSsr from '@mui/material/NoSsr';
 import IconButton from '@mui/material/IconButton';
 import SvgIcon from '@mui/material/SvgIcon';
 import { useTranslation } from 'react-i18next';
+import { Iconify } from '@fuse/components/iconify';
 
 /**
  * The user menu.
@@ -135,7 +136,7 @@ function UserMenu() {
 							role="button"
 						>
 							<ListItemIcon className="min-w-40">
-								<FuseSvgIcon>heroicons-outline:lock-closed</FuseSvgIcon>
+								<Iconify icon="solar:lock-unlocked-bold-duotone" />
 							</ListItemIcon>
 							<ListItemText primary={t('SIGN_IN')} />
 						</MenuItem>
@@ -145,7 +146,7 @@ function UserMenu() {
 							role="button"
 						>
 							<ListItemIcon className="min-w-40">
-								<FuseSvgIcon>heroicons-outline:user-add </FuseSvgIcon>
+								<Iconify icon="solar:user-bold-duotone" />
 							</ListItemIcon>
 							<ListItemText primary={t('SIGN_UP')} />
 						</MenuItem>
@@ -159,7 +160,7 @@ function UserMenu() {
 							role="button"
 						>
 							<ListItemIcon className="min-w-40">
-								<FuseSvgIcon>heroicons-outline:user-circle</FuseSvgIcon>
+								<Iconify icon="solar:user-bold-duotone" />
 							</ListItemIcon>
 							<ListItemText primary={t('MY_ACCOUNT')} />
 						</MenuItem>
@@ -169,7 +170,7 @@ function UserMenu() {
 							}}
 						>
 							<ListItemIcon className="min-w-40">
-								<FuseSvgIcon>heroicons-outline:logout</FuseSvgIcon>
+								<Iconify icon="solar:user-block-bold-duotone" />
 							</ListItemIcon>
 							<ListItemText primary={t('SIGN_OUT')} />
 						</MenuItem>

@@ -119,7 +119,7 @@ function Product() {
 		return <FuseLoading />;
 	}
 
-	const metadata = { title: `Product details -` };
+	const metadata = { title: product.name };
 	return (
 		<FormProvider {...methods}>
 			<Helmet>

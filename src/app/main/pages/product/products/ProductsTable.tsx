@@ -63,7 +63,8 @@ function ProductsTable(props: ProductsTableProps) {
 					<Box
 						gap={3}
 						display="grid"
-						mb={32}
+						mb={22}
+						pt={2}
 						gridTemplateColumns={{
 							xs: 'repeat(1, 1fr)',
 							sm: 'repeat(2, 1fr)',

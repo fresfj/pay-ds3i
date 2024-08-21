@@ -3,6 +3,7 @@ import { blueGrey } from '@mui/material/colors'
 import { FuseThemesType } from '@fuse/core/FuseSettings/FuseSettings'
 import { createPaletteChannel, varAlpha } from 'src/theme/styles'
 import COLORS from './colors.json'
+import { er } from '@fullcalendar/core/internal-common'
 
 declare module '@mui/material/styles/createPalette' {
   interface CommonColors {
@@ -125,6 +126,8 @@ export const background = {
 export const lightPaletteText = {
   primary: 'rgb(17, 24, 39)',
   secondary: 'rgb(107, 114, 128)',
+  error: '#FF4842',
+  success: '#54D62C',
   disabled: 'rgb(149, 156, 169)'
 }
 
@@ -134,6 +137,8 @@ export const lightPaletteText = {
 export const darkPaletteText = {
   primary: 'rgb(255,255,255)',
   secondary: 'rgb(148, 163, 184)',
+  error: '#B72136',
+  success: '#229A16',
   disabled: 'rgb(156, 163, 175)'
 }
 

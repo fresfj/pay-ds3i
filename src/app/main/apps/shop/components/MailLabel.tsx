@@ -26,7 +26,7 @@ function ProductLabel(props: ProductLabelProps) {
 			label={label.content}
 			classes={{
 				root: clsx('h-24 border-0 rounded-4', className, label.color && labelColorDefs[label.color].combined),
-				label: 'px-6 py-4 text-12 font-semibold uppercase leading-none'
+				label: 'px-8 py-4 text-10 font-semibold uppercase leading-none'
 			}}
 		/>
 	);

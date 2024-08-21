@@ -25,10 +25,18 @@ type Props = {
   product?: EcommerceProduct;
 };
 
+export const calculateDiscountPercentage = (originalPrice, discountedPrice) => {
+  const discount = originalPrice - discountedPrice;
+  const discountPercentage = (discount / originalPrice) * 100;
+  return discountPercentage.toFixed(0);
+};
+
+
 export function ProductItem({ product }: Props) {
   const { id, name, colors, sizes, featuredImageId, images, priceTaxIncl, comparedPrice, label, quantity, handle } = product;
 
   const dispatch = useAppDispatch();
+  const discountPercentage = calculateDiscountPercentage(comparedPrice, priceTaxIncl);
 
   const handleAddCart = async () => {
     const newProduct = {
@@ -119,18 +127,22 @@ export function ProductItem({ product }: Props) {
 
   const renderContent = (
     <Stack spacing={2.5} sx={{ p: 3, pt: 2 }}>
-      <Link component={RouterLink} href={`${id}/${handle}`} color="inherit" variant="subtitle2" noWrap>
+      <Link className='font-semibold text-xl' component={RouterLink} href={`${id}/${handle}`} variant="subtitle2" noWrap>
         {name}
       </Link>
       <Stack direction="row" alignItems="center" justifyContent="space-between">
         {colors ? <ColorPreview colors={colors} /> : <Stack></Stack>}
-        <Stack direction="row" spacing={0.5} sx={{ typography: 'subtitle1' }}>
+        <Stack direction="row" alignItems="center" spacing={0.5} sx={{ typography: 'subtitle1' }}>
           {priceTaxIncl < comparedPrice && (
-            <Box component="span" sx={{ color: 'text.disabled', textDecoration: 'line-through' }}>
-              {FuseUtils.formatCurrency(comparedPrice)}
+            <Box component="small" sx={{ color: 'text.disabled', textDecoration: 'line-through', textDecorationColor: 'rgb(255 72 66 / 70%)', }}>{FuseUtils.formatCurrency(comparedPrice)}
             </Box>
           )}
-          <Box component="span">{FuseUtils.formatCurrency(priceTaxIncl)}</Box>
+          <Box component="small" color='text.primary' className='font-semibold'>{FuseUtils.formatCurrency(priceTaxIncl)}</Box>
+          {priceTaxIncl < comparedPrice && (
+            <Box component="small" color="success.main" className='font-semibold'>
+              {`(-${discountPercentage}%)`}
+            </Box>
+          )}
         </Stack>
       </Stack>
     </Stack>
@@ -138,7 +150,7 @@ export function ProductItem({ product }: Props) {
 
 
   return (
-    <Card className='rounded-lg relative' sx={{ '&:hover .add-cart-btn': { opacity: 1 } }}>
+    <Card className='rounded-lg relative transition duration-300 delay-150 hover:-translate-y-6' sx={{ '&:hover .add-cart-btn': { opacity: 1 } }}>
       {renderLabels}
 
       {renderImg}
