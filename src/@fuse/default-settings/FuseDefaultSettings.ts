@@ -184,7 +184,7 @@ export const defaultThemeOptions = {
     MuiDialog: {
       styleOverrides: {
         paper: {
-          borderRadius: 16
+          borderRadius: 8
         }
       }
     },
@@ -194,7 +194,7 @@ export const defaultThemeOptions = {
           backgroundImage: 'none'
         },
         rounded: {
-          borderRadius: 16
+          borderRadius: 8
         }
       }
     },

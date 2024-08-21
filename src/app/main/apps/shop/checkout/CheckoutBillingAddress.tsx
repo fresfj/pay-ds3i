@@ -4,6 +4,8 @@ import { AddressItem } from '../address';
 import { setAddress } from '../store/cartSlice';
 import { useAppDispatch } from 'app/store/store';
 import { useTranslation } from 'react-i18next';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
 
 type Props = {
   onNextStep: () => void;
@@ -20,9 +22,31 @@ export function CheckoutBillingAddress({ customer, onNextStep }: Props) {
     onNextStep()
   }
 
+  if (!addresses) {
+    return (
+      <Paper
+        sx={{
+          gap: 2,
+          mb: 4,
+          height: 200,
+          display: 'flex',
+          position: 'relative',
+          alignItems: { md: 'center' },
+          flexDirection: { xs: 'column', md: 'row' },
+        }}
+      >
+        <Stack flexGrow={1} spacing={1}>
+          <Stack direction="row" justifyContent="center" alignContent="center" alignItems="center">
+            <Typography variant="h6">Não há nenhum endereço cadastrado.</Typography>
+          </Stack>
+        </Stack>
+      </Paper>
+    )
+  }
+
   return (
     <>
-      {addresses.slice(0, 4).map((address) => (
+      {addresses && addresses?.slice(0, 4).map((address) => (
         <AddressItem
           key={address.id}
           address={address}
@@ -50,7 +74,6 @@ export function CheckoutBillingAddress({ customer, onNextStep }: Props) {
           }}
         />
       ))}
-
     </>
   );
 }

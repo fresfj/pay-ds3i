@@ -142,7 +142,7 @@ function OptionItem({
       {isCredit && (
         <Stack spacing={2.5} alignItems="flex-end" sx={{ pt: 2.5 }}>
           <TextField select fullWidth label="Cards" SelectProps={{ native: true }}>
-            {cardOptions.map((card) => (
+            {cardOptions?.map((card) => (
               <option key={card.creditCard.number} value={card.creditCard.number}>
                 {`**** **** **** ${card.creditCard.number.slice(-4)} (${FuseUtils.identifyCardBrand(card.creditCard.number)?.brand}) - ${card.creditCard.holderName}`}
               </option>

@@ -23,6 +23,7 @@ type FusePageSimpleProps = SystemStyleObject<Theme> & {
 	header?: ReactNode;
 	content?: ReactNode;
 	scroll?: 'normal' | 'page' | 'content';
+	fullScreen?: boolean;
 	leftSidebarOpen?: boolean;
 	rightSidebarOpen?: boolean;
 	leftSidebarWidth?: number;
@@ -211,6 +212,7 @@ const FusePageSimple = forwardRef<
 		content,
 		leftSidebarContent,
 		rightSidebarContent,
+		fullScreen = false,
 		leftSidebarOpen = false,
 		rightSidebarOpen = false,
 		rightSidebarWidth = 240,
@@ -282,14 +284,14 @@ const FusePageSimple = forwardRef<
 						<div
 							className="FusePageSimple-contentWrapper"
 
-							// enable={scroll === 'page'}
+						// enable={scroll === 'page'}
 						>
 							{header && <FusePageSimpleHeader header={header} />}
 
 							{content && (
 								<FuseScrollbars
 									enable={scroll === 'content'}
-									className={clsx('FusePageSimple-content container')}
+									className={clsx(`FusePageSimple-content ${fullScreen ? '' : 'container'}`)}
 								>
 									{content}
 								</FuseScrollbars>

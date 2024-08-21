@@ -14,11 +14,15 @@ function Referral() {
 	const isMobile = useThemeMediaQuery((theme) => theme.breakpoints.down('lg'));
 
 	return (
-		<FusePageSimple
-			header={<ReferralHeader />}
-			content={<ReferralCard />}
-			scroll={isMobile ? 'normal' : 'content'}
-		/>
+		<>
+			<FusePageSimple
+				fullScreen
+				className="mx-auto"
+				header={<ReferralHeader />}
+				content={<ReferralCard />}
+				scroll={isMobile ? 'normal' : 'normal'}
+			/>
+		</>
 	);
 }
 export default Referral;
