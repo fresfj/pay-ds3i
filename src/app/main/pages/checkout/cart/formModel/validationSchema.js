@@ -6,6 +6,7 @@ import {
   validateCPF,
   validatePhone,
   validateEmail,
+  validateCNPJ,
   validateCep
 } from 'validations-br'
 
@@ -27,6 +28,7 @@ const {
     installments,
     nameOnCard,
     cardNumber,
+    cardDocument,
     expiryDate,
     cvv
   }
@@ -101,6 +103,23 @@ export default [
     ),
     [nameOnCard.name]: Yup.string().required(`${nameOnCard.requiredErrorMsg}`),
     [cardNumber.name]: Yup.string().required(`${cardNumber.requiredErrorMsg}`),
+    [cardDocument.name]: Yup.string()
+      .required(`${cardDocument.requiredErrorMsg}`)
+      .test(
+        'is-cpf-cnpj',
+        `${cardDocument.validatedErrorMsg}`,
+        function (value) {
+          if (!value) return false
+          const cleanedValue = value.replace(/\D/g, '')
+
+          if (cleanedValue.length === 11) {
+            return validateCPF(cleanedValue)
+          } else if (cleanedValue.length === 14) {
+            return validateCNPJ(cleanedValue)
+          }
+          return false
+        }
+      ),
     [expiryDate.name]: Yup.string()
       .nullable()
       .required(`${expiryDate.requiredErrorMsg}`)

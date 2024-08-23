@@ -387,6 +387,99 @@ export const accountApiMocks = (mock: ExtendedMockAdapter) => {
     })
   })
 
+  mock.onGet('/account/referral').reply(config => {
+    const { account }: any = config.params as Params
+
+    const ordersRef = firebase
+      .firestore()
+      .collection('orders')
+      .where('cart.referral.id', '==', account.data.customer.id)
+
+    return new Promise(async (resolve, reject) => {
+      await ordersRef
+        .get()
+        .then(async querySnapshot => {
+          const newData = querySnapshot.docs.map(doc => {
+            const products = []
+            doc.data().cart.products.map((itens: any) => {
+              products.push({
+                id: itens.id,
+                name: itens.name ? itens.name : itens.title,
+                price: itens.value,
+                quantity: itens.quantity,
+                total: itens.value,
+                image: itens.image
+              })
+            })
+
+            const ordeAdd = {
+              reference: doc.data().payment?.invoiceNumber
+                ? doc.data().payment?.invoiceNumber
+                : doc.data().payment?.id
+                  ? doc.data().payment?.id.replace('sub_', '')
+                  : doc.data().id,
+              id: doc.data().id,
+              subtotal: doc.data().cart.subTotal,
+              tax: '0',
+              discount: doc.data().cart.discount.value,
+              total: doc.data().cart?.total,
+              date: new Date(doc.data().createdAt.toDate()),
+              customer: {
+                id: doc.data().customer?.id,
+                firstName: doc.data().customer?.firstName
+                  ? doc.data().customer?.firstName
+                  : doc.data().customer?.name,
+                cpfCnpj: doc.data().customer?.cpfCnpj,
+                email: doc.data().customer?.email,
+                phone: doc.data().customer?.phone,
+                invoiceAddress: {
+                  address: doc.data().customer?.invoiceAddress?.address,
+                  lat: doc.data().customer?.invoiceAddress?.lat,
+                  lng: doc.data().customer?.invoiceAddress?.lng
+                },
+                shippingAddress: {
+                  address: doc.data().customer?.shippingAddress?.address,
+                  lat: doc.data().customer?.shippingAddress?.lat,
+                  lng: doc.data().customer?.shippingAddress?.lng
+                }
+              },
+              products,
+              status: [
+                {
+                  id: 1,
+                  name: doc.data().payment.status,
+                  date: doc.data().payment.dueDate
+                }
+              ],
+              payment: {
+                transactionId: doc.data().payment.id,
+                creditCard: doc.data().payment?.creditCard,
+                amount: doc.data().payment.value,
+                method: doc.data().payment.billingType,
+                date: doc.data().payment.dueDate
+              },
+              shopping: doc.data().cart?.shopping,
+              shippingDetails: [
+                {
+                  tracking: '',
+                  carrier: '',
+                  weight: '',
+                  fee: '',
+                  date: ''
+                }
+              ]
+            }
+            return { ...ordeAdd, id: doc.id }
+          })
+
+          resolve([200, newData])
+        })
+        .catch(error => {
+          resolve([404, 'Requested order do not exist.'])
+        })
+    })
+  })
+
   mock.onGet('/account/orders/:id').reply(config => {
     const { id } = config.params as Params
     const ordersRef = firebase.firestore().collection('orders').doc(id)

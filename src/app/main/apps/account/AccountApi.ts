@@ -15,7 +15,8 @@ export const addTagTypes = [
   'profile_timeline',
   'profile_about',
   'account_orders',
-  'account_order'
+  'account_order',
+  'account_referral'
 ] as const
 
 const AccountApi = api
@@ -24,6 +25,16 @@ const AccountApi = api
   })
   .injectEndpoints({
     endpoints: build => ({
+      getAccountsReferral: build.query<
+        GetAccountsOrdersApiResponse,
+        GetAccountsOrdersApiArg
+      >({
+        query: account => ({
+          url: `/mock-api/account/referral`,
+          params: { account }
+        }),
+        providesTags: ['account_referral']
+      }),
       getAccountsOrders: build.query<
         GetAccountsOrdersApiResponse,
         GetAccountsOrdersApiArg
@@ -372,6 +383,7 @@ export type AccountAbout = {
 }
 
 export const {
+  useGetAccountsReferralQuery,
   useGetAccountsOrdersQuery,
   useGetAccountsOrderQuery,
   useDeleteAccountsAddressMutation,

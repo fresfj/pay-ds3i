@@ -45,7 +45,7 @@ const inputGlobalStyles = (
 				color: theme.palette.primary.main,
 				textDecoration: 'none',
 				'&:hover': {
-					textDecoration: 'underline'
+					textDecoration: 'none'
 				}
 			},
 			'a.link, a:not([role=button])[target=_blank]': {

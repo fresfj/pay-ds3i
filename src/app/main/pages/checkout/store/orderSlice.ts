@@ -161,6 +161,17 @@ export const sendOrderToAsaas = createAsyncThunk(
         })
     }
 
+    const cart = {
+      products: data.cart.products.map((produto: any) => ({
+        sku: produto.sku,
+        name: produto.name,
+        value: produto.value
+      })),
+      shipping: data.cart.shipping,
+      discount: data.cart.discount,
+      total: data.cart.total
+    }
+
     const processPayment = async (
       paymentData: any,
       isSubscription: boolean
@@ -175,7 +186,7 @@ export const sendOrderToAsaas = createAsyncThunk(
               parseFloat(data.cart?.shipping.value)
             ).toFixed(2),
             customerInformation: data.customer,
-            cart: data.cart
+            cart
           })
         }
         return response
@@ -202,7 +213,7 @@ export const sendOrderToAsaas = createAsyncThunk(
               ? data.cart?.installmentValue
               : data.cart?.total,
           customerInformation: data.customer,
-          cart: data.cart
+          cart
         }
         payment = await processPayment(newDataPay, false)
       } else if (data.cart.discount.value !== 0) {
@@ -210,7 +221,7 @@ export const sendOrderToAsaas = createAsyncThunk(
           {
             ...dataPayments,
             customerInformation: data.customer,
-            cart: data.cart
+            cart
           },
           true
         )
@@ -219,7 +230,7 @@ export const sendOrderToAsaas = createAsyncThunk(
           {
             ...dataPayments,
             customerInformation: data.customer,
-            cart: data.cart
+            cart
           },
           true
         )

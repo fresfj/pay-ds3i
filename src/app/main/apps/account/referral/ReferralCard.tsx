@@ -25,6 +25,7 @@ import TableRow from '@mui/material/TableRow';
 import { Divider, lighten, TableSortLabel, Tooltip } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
+import { useGetAccountsReferralQuery } from '../AccountApi';
 
 function createData(
 	name: string,
@@ -97,10 +98,11 @@ const rows: rowType[] = [
 function ReferralCard() {
 	const dispatch = useAppDispatch();
 	const { copy } = useCopyToClipboard();
-	const { uid } = useSelector(selectUser);
+	const user = useSelector(selectUser);
 	const { t } = useTranslation('accountApp');
 
-	const fullURL = window.location.href + `?rid=${uid}`;
+	const { data, isLoading } = useGetAccountsReferralQuery(user);
+	const fullURL = window.location.href + `?rid=${user.uid}`;
 
 	const onCopy = useCallback(
 		() => {
@@ -252,7 +254,7 @@ function ReferralCard() {
 										Você já indicou
 									</Box>
 									<Box component="span" className='text-2xl font-bold' sx={{ textAlign: 'right' }}>
-										<AnimatedCounter value={0} includeDecimals={false} />
+										<AnimatedCounter value={data?.length} includeDecimals={false} />
 									</Box>
 								</Stack>
 								<Stack spacing={0.5}>
@@ -268,7 +270,7 @@ function ReferralCard() {
 										Você vai receber
 									</Box>
 									<Box component="span" className='text-2xl font-bold' sx={{ textAlign: 'right' }}>
-										{FuseUtils.formatCurrency('0')}
+										{FuseUtils.formatCurrency(data?.length > 0 ? data?.length * 20 : 0)}
 									</Box>
 								</Stack>
 							</Stack>
@@ -280,7 +282,7 @@ function ReferralCard() {
 			<Paper className="flex flex-col rounded-0 items-center px-24 py-40 sm:px-64 sm:pb-80 sm:pt-52">
 				<div className="mx-auto flex w-full max-w-7xl flex-col items-center text-center">
 
-					{true ?
+					{data?.length === 0 ?
 						<>
 							<Typography variant='h5' className='text-xl font-medium text-grey-A400'>
 								Você ainda não tem nenhuma indicação registrada
@@ -324,18 +326,23 @@ function ReferralCard() {
 									</TableRow>
 								</TableHead>
 								<TableBody>
-									{rowsLine.map((row) => (
+									{data.map((row) => (
 										<TableRow
-											key={row.name}
+											key={row.id}
 											sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
 										>
+											<>
+												{
+													console.log(row)
+												}
+											</>
 											<TableCell component="th" scope="row">
 												<Typography className='font-medium'>
-													{row.name}
+													{row.customer.firstName}
 												</Typography>
 											</TableCell>
 											<TableCell align="right">
-												{FuseUtils.formatCurrency(row.value)}
+												{FuseUtils.formatCurrency(row.total)}
 											</TableCell>
 											<TableCell
 												align="center"
@@ -345,16 +352,16 @@ function ReferralCard() {
 												<Typography
 													className={clsx(
 														'inline-flex items-center font-bold text-10 px-10 py-2 rounded-full tracking-wide uppercase',
-														row.status === 'PENDING' &&
+														row.status[0].name === 'PENDING' &&
 														'bg-red-100 text-red-800 dark:bg-red-600 dark:text-red-50',
-														row.status === 'CONFIRMED' &&
+														row.status[0].name === 'CONFIRMED' &&
 														'bg-green-50 text-green-800 dark:bg-green-600 dark:text-green-50',
-														(row.status === 'RECEIVED' ||
-															row.status === 'ACTIVE') &&
+														(row.status[0].name === 'RECEIVED' ||
+															row.status[0].name === 'ACTIVE') &&
 														'bg-blue-50 text-blue-800 dark:bg-blue-600 dark:text-blue-50'
 													)}
 												>
-													{row.status}
+													{row.status[0].name}
 												</Typography>
 											</TableCell>
 											<TableCell align="right">{row.date}</TableCell>

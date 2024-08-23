@@ -14,7 +14,12 @@ import {
   ToggleButtonGroup
 } from '@mui/material'
 import { useDeepCompareEffect } from '@fuse/hooks'
-import { InputField, InputFieldNumber, SelectField } from '../formFields'
+import {
+  InputField,
+  InputFieldNumber,
+  SelectField,
+  InputDocument
+} from '../formFields'
 import {
   addCustomer,
   calculateTotalSelector,
@@ -191,6 +196,7 @@ export default function PaymentForm(props) {
     formField: {
       installments,
       nameOnCard,
+      cardDocument,
       cardNumber,
       expiryDate,
       cvv,
@@ -207,7 +213,8 @@ export default function PaymentForm(props) {
   const [toggle, setToggle] = useState({})
   const [loading, setLoading] = useState(true)
   const [payments, setPayments] = useState([
-    { value: 'card', label: 'Cartão de Crédito', svg: 'credit-card' }
+    { value: 'card', label: 'Cartão de Crédito', svg: 'credit-card' },
+    { value: 'pix', label: 'PIX', svg: 'pix' }
   ])
   const [valueInstallments, setValueInstallments] = useState([])
   const total = useSelector(calculateTotalSelector)
@@ -389,13 +396,13 @@ export default function PaymentForm(props) {
         items
       }
 
-      if (products[0]?.payments !== undefined) {
-        const paymentsSelected = products[0]?.payments.map(pay => {
-          const info = toggleButtons.find(button => button.value === pay)
-          return { value: info.value, label: info.label, svg: info.svg }
-        })
-        setPayments(paymentsSelected)
-      }
+      // if (products[0]?.payments !== undefined) {
+      //   const paymentsSelected = products[0]?.payments.map(pay => {
+      //     const info = toggleButtons.find(button => button.value === pay)
+      //     return { value: info.value, label: info.label, svg: info.svg }
+      //   })
+      //   setPayments(paymentsSelected)
+      // }
     }
 
     if (!cart?.customer) {
@@ -426,6 +433,7 @@ export default function PaymentForm(props) {
       }
     })()
   }, [total])
+
   return (
     <Root>
       <StyledToggleButtonGroup
@@ -506,10 +514,17 @@ export default function PaymentForm(props) {
                   <Grid item xs={12} md={3}>
                     <InputField name={cvv.name} label={cvv.label} fullWidth />
                   </Grid>
-                  <Grid item xs={12} md={12}>
+                  <Grid item xs={12} md={6}>
                     <InputField
                       name={nameOnCard.name}
                       label={nameOnCard.label}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <InputDocument
+                      name={cardDocument.name}
+                      label={cardDocument.label}
                       fullWidth
                     />
                   </Grid>

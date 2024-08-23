@@ -6,6 +6,7 @@ const cartSlice = createSlice({
   name: 'checkoutApp/cart',
   initialState: {
     customer: null,
+    referral: {},
     products: [],
     quantity: 0,
     discount: { value: 0, code: '', applied: '' },
@@ -16,6 +17,9 @@ const cartSlice = createSlice({
   reducers: {
     addCustomer: (state, action) => {
       state.customer = action.payload
+    },
+    addReferral: (state, action) => {
+      state.referral = action.payload
     },
     addToCart: (state, action) => {
       const itemExists = state.products.find(
@@ -62,9 +66,11 @@ const cartSlice = createSlice({
     },
     addDiscount: (state, action) => {
       state.discount = action.payload
+      updateCartTotals(state)
     },
     removeDiscount: state => {
       state.discount = { value: 0, code: '', applied: '' }
+      updateCartTotals(state)
     },
     getTotals(state: any) {
       let { total, quantity } = state.products.reduce(
@@ -113,6 +119,7 @@ export default cartSlice.reducer
 export const {
   addToCart,
   addCustomer,
+  addReferral,
   addDiscount,
   setShipping,
   updateProduct,

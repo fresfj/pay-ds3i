@@ -238,6 +238,11 @@ export type Customer = {
   tags?: string[]
   subscription?: CustomerSubscription
   subscriptions?: CustomerSubscriptions[]
+  referral?: {
+    status: boolean
+    discount: number
+    labels: string[]
+  }
 }
 
 export type Tag = {

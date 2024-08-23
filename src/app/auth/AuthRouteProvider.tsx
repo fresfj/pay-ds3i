@@ -102,8 +102,6 @@ function AuthRoute(props: AuthProviderProps) {
 
 	const getNotification = async (id: string) => {
 		const { allQuizzes, pendingQuizzes, completedQuizzes }: any = await fetchQuizzes(id)
-		console.log(`allQuizzes`, allQuizzes)
-		console.log(`pendingQuizzes`, pendingQuizzes)
 		return pendingQuizzes
 	}
 	/**
@@ -166,7 +164,7 @@ function AuthRoute(props: AuthProviderProps) {
 						addNotification(item);
 
 					}
-					console.log(`notifications --- `, _user.uid)
+
 
 					dispatch(setUser({ ...user, data: { ...user.data, customer: userCollection } }));
 					setAuthService('firebase');

@@ -5,7 +5,7 @@ import history from '@history'
 import Box from '@mui/material/Box';
 import { lighten, ThemeProvider } from '@mui/material/styles';
 import { selectMainThemeDark } from '@fuse/core/FuseSettings/store/fuseSettingsSlice';
-import { Accordion, AccordionDetails, AccordionSummary, Autocomplete, Button, CardContent, CardHeader, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Fade, FormControl, Grid, IconButton, InputAdornment, MobileStepper, Skeleton, Stack, Step, Stepper, TextField } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, Autocomplete, Button, CardContent, CardHeader, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, Divider, Fade, FormControl, Grid, IconButton, InputAdornment, MobileStepper, Popover, Skeleton, Stack, Step, Stepper, TextField, Tooltip } from '@mui/material';
 import Card from '@mui/material/Card';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
@@ -29,12 +29,13 @@ import PaymentForm from './forms/PaymentForm'
 import LoadingButton from '@mui/lab/LoadingButton';
 import clsx from 'clsx';
 import firebase from 'firebase/compat/app'
-import { addCustomer, addDiscount, addToCart, calculateTotalSelector, getTotals, removeDiscount, updateProduct } from '../store/cartSlice';
+import { addCustomer, addDiscount, addReferral, addToCart, calculateTotalSelector, getTotals, removeDiscount, updateProduct } from '../store/cartSlice';
 import { OrderDataProps, createOrder, createOrderCartToCustomer, removeCart } from '../store/orderSlice';
 import { useGetECommerceProductQuery, useGetECommerceCouponQuery, useCreateConversionTrackingMutation } from '../CheckoutApi';
 import { useAppDispatch } from 'app/store/store';
 import {
 	useCreateCustomersItemMutation,
+	useGetCustomersItemQuery,
 	useGetCustomersParamsQuery
 } from 'src/app/main/apps/customers/CustomersApi'
 import InputField from './formFields/InputField';
@@ -46,6 +47,9 @@ import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import { Image } from '@fuse/components/image'
+import { Iconify } from '@fuse/components/iconify';
+import { labelColorDefs, labelColors } from 'src/app/main/apps/shop/components/labelColors';
+import ReferralLabels from '@fuse/components/label/referralLabels';
 const steps = ['Informações', 'Entrega', 'Pagamento']
 const { formId, formField } = checkoutFormModel
 
@@ -328,10 +332,12 @@ function CheckoutPage() {
 	const location = useLocation()
 	const searchParams = new URLSearchParams(location.search)
 	const currentAmount = searchParams.get('amount') || '';
+
 	const [amount, setAmount] = useState(currentAmount)
 	const cookiesLabel = [
 		'_fbp',
 		'_fbc',
+		'rid',
 		'cartId',
 		'fullName',
 		'birthday',
@@ -363,6 +369,8 @@ function CheckoutPage() {
 	const currentUrl = window.location.href
 	const [createConversionTracking] = useCreateConversionTrackingMutation()
 
+	const customerId = searchParams.get('rid') || '';
+	const { data: referralCustomer } = useGetCustomersItemQuery(customerId, { skip: !customerId });
 
 	useEffect(() => {
 		const initializeFingerprint = async () => {
@@ -907,6 +915,27 @@ function CheckoutPage() {
 			}))
 		}
 
+		if (referralCustomer?.referral && referralCustomer?.referral?.status) {
+			dispatch(
+				addReferral(
+					{
+						id: referralCustomer.id,
+						name: referralCustomer.name,
+						...referralCustomer?.referral
+					}
+				)
+			)
+
+			const subTotal = ((total * referralCustomer?.referral.discount) / 100)
+			setDiscount(subTotal)
+			setDiscountApplied(`${referralCustomer?.referral.discount}%`)
+			dispatch(addDiscount({
+				value: subTotal,
+				code: 'REFERRAL',
+				applied: `${referralCustomer?.referral.discount}%`
+			}))
+		}
+
 		setTimeout(() => {
 			dispatch(getTotals())
 			setLoading(false)
@@ -1299,6 +1328,21 @@ function CheckoutPage() {
 													}
 												/>
 												<CardContent sx={{ padding: '0 !important' }}>
+													{referralCustomer?.referral && referralCustomer?.referral.status &&
+														<motion.div
+															initial={{ opacity: 0 }}
+															animate={{ opacity: 1, transition: { delay: 0.3 } }}
+														>
+															<ReferralLabels referralCustomer={
+																{
+																	name: referralCustomer.name,
+																	referral: referralCustomer?.referral
+																}
+															}
+															/>
+															<Divider sx={{ borderStyle: 'dashed', my: 2 }} />
+														</motion.div>
+													}
 													{cart?.products.length > 0 ? (
 														cart.products.map((item, k) => (
 															<div key={k}>
@@ -1516,8 +1560,8 @@ function CheckoutPage() {
 					onClose={handleClose}
 					value={amount}
 				/>
-			</div>
-		</Root>
+			</div >
+		</Root >
 	);
 }
 

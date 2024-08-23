@@ -80,7 +80,6 @@ export function ProductItem({ product }: Props) {
 
   const renderImg = (
     <Box sx={{ position: 'relative', p: 1 }}>
-
       {!!quantity && (
         <Fab
           color="warning"
@@ -126,10 +125,10 @@ export function ProductItem({ product }: Props) {
   );
 
   const renderContent = (
-    <Stack spacing={2.5} sx={{ p: 3, pt: 2 }}>
-      <Link className='font-semibold text-xl' component={RouterLink} href={`${id}/${handle}`} variant="subtitle2" noWrap>
+    <Stack spacing={2.5} sx={{ p: 3, pt: 2 }} component={RouterLink} href={`${id}/${handle}`}>
+      <Box className='font-semibold text-xl' component="small" sx={{ typography: 'subtitle2' }}>
         {name}
-      </Link>
+      </Box>
       <Stack direction="row" alignItems="center" justifyContent="space-between">
         {colors ? <ColorPreview colors={colors} /> : <Stack></Stack>}
         <Stack direction="row" alignItems="center" spacing={0.5} sx={{ typography: 'subtitle1' }}>
