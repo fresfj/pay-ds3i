@@ -1333,12 +1333,7 @@ function CheckoutPage() {
 															initial={{ opacity: 0 }}
 															animate={{ opacity: 1, transition: { delay: 0.3 } }}
 														>
-															<ReferralLabels referralCustomer={
-																{
-																	name: referralCustomer.name,
-																	referral: referralCustomer?.referral
-																}
-															}
+															<ReferralLabels referralCustomer={{ name: referralCustomer.name, referral: referralCustomer.referral }}
 															/>
 															<Divider sx={{ borderStyle: 'dashed', my: 2 }} />
 														</motion.div>

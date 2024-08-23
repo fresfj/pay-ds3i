@@ -5,15 +5,15 @@ import { Iconify } from '../iconify';
 
 interface ReferralCustomer {
   name: string;
-  referral: {
-    discount: number;
-    labels: string[];
-    status: boolean;
+  referral?: {
+    discount?: number;
+    labels?: string[];
+    status?: boolean;
   };
 }
 
 interface Props {
-  referralCustomer: ReferralCustomer;
+  referralCustomer?: ReferralCustomer;
 }
 
 const labelDetails: { [key: string]: { background: string; color: string; icon: string } } = {
