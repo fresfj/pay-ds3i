@@ -239,9 +239,9 @@ export type Customer = {
   subscription?: CustomerSubscription
   subscriptions?: CustomerSubscriptions[]
   referral?: {
-    status: boolean
-    discount: number
-    labels: string[]
+    status?: boolean
+    discount?: number
+    labels?: string[]
   }
 }
 
