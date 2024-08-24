@@ -136,7 +136,7 @@ export function ProductItem({ product }: Props) {
             <Box component="small" sx={{ color: 'text.disabled', textDecoration: 'line-through', textDecorationColor: 'rgb(255 72 66 / 70%)', }}>{FuseUtils.formatCurrency(comparedPrice)}
             </Box>
           )}
-          <Box component="small" color='text.primary' className='font-semibold'>{FuseUtils.formatCurrency(priceTaxIncl)}</Box>
+          <Box component="small" color='text.primary' className='font-semibold text-lg'>{FuseUtils.formatCurrency(priceTaxIncl)}</Box>
           {priceTaxIncl < comparedPrice && (
             <Box component="small" color="success.main" className='font-semibold'>
               {`(-${discountPercentage}%)`}

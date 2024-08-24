@@ -15,6 +15,7 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import FuseUtils from '@fuse/utils';
 import { AnimatedCounter } from 'react-animated-counter';
+import _ from '@lodash';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -22,7 +23,9 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { Divider, lighten, TableSortLabel, Tooltip } from '@mui/material';
+import { Avatar, Divider, lighten, TableSortLabel, Tooltip } from '@mui/material';
+import AvatarGroup from '@mui/material/AvatarGroup';
+
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { useGetAccountsReferralQuery } from '../AccountApi';
@@ -70,6 +73,20 @@ const rows: rowType[] = [
 		sort: true
 	},
 	{
+		id: 'deposit',
+		align: 'right',
+		disablePadding: false,
+		label: 'DEPOSIT',
+		sort: true
+	},
+	{
+		id: 'product',
+		align: 'left',
+		disablePadding: false,
+		label: 'PRODUCT',
+		sort: true
+	},
+	{
 		id: 'payment',
 		align: 'right',
 		disablePadding: false,
@@ -102,7 +119,8 @@ function ReferralCard() {
 	const { t } = useTranslation('accountApp');
 
 	const { data, isLoading } = useGetAccountsReferralQuery(user);
-	const fullURL = window.location.href + `?rid=${user.uid}`;
+	const baseURL = `${window.location.protocol}//${window.location.host}`;
+	const fullURL = `${baseURL}?rid=${user.uid}`
 
 	const onCopy = useCallback(
 		() => {
@@ -282,7 +300,7 @@ function ReferralCard() {
 			<Paper className="flex flex-col rounded-0 items-center px-24 py-40 sm:px-64 sm:pb-80 sm:pt-52">
 				<div className="mx-auto flex w-full max-w-7xl flex-col items-center text-center">
 
-					{data?.length === 0 ?
+					{!data && data?.length === 0 ?
 						<>
 							<Typography variant='h5' className='text-xl font-medium text-grey-A400'>
 								Você ainda não tem nenhuma indicação registrada
@@ -326,20 +344,41 @@ function ReferralCard() {
 									</TableRow>
 								</TableHead>
 								<TableBody>
-									{data.map((row) => (
+									{data && data.map((row) => (
 										<TableRow
 											key={row.id}
 											sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
 										>
-											<>
-												{
-													console.log(row)
-												}
-											</>
 											<TableCell component="th" scope="row">
 												<Typography className='font-medium'>
 													{row.customer.firstName}
 												</Typography>
+												<Typography className='font-normal text-xs'>
+													{row.customer.email}
+												</Typography>
+											</TableCell>
+											<TableCell align="right">
+											</TableCell>
+											<TableCell align="right">
+												{Boolean(row.products.length) && (
+													<div className="flex items-center">
+														<AvatarGroup max={2}>
+															{row.products.map((product, index) => (
+																<Stack direction="row" alignItems="center" spacing={0.5} >
+																	<Avatar
+																		key={index}
+																		alt={product.name}
+																		className='inline-block rounded-lg ring-2 ring-white bg-white'
+																		src={_.find(product.images, { id: product.featuredImageId })?.url}
+																	/>
+																	<Box component="span" sx={{ typography: 'body2', color: 'text.secondary' }}>
+																		{product.name}
+																	</Box>
+																</Stack>
+															))}
+														</AvatarGroup>
+													</div>
+												)}
 											</TableCell>
 											<TableCell align="right">
 												{FuseUtils.formatCurrency(row.total)}

@@ -408,7 +408,8 @@ export const accountApiMocks = (mock: ExtendedMockAdapter) => {
                 price: itens.value,
                 quantity: itens.quantity,
                 total: itens.value,
-                image: itens.image
+                featuredImageId: itens.featuredImageId,
+                images: itens.images
               })
             })
 

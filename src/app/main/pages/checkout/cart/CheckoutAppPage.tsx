@@ -29,7 +29,7 @@ import PaymentForm from './forms/PaymentForm'
 import LoadingButton from '@mui/lab/LoadingButton';
 import clsx from 'clsx';
 import firebase from 'firebase/compat/app'
-import { addCustomer, addDiscount, addReferral, addToCart, calculateTotalSelector, getTotals, removeDiscount, updateProduct } from '../store/cartSlice';
+import { addCustomer, addDiscount, addReferral, addToCart, calculateTotalSelector, clearCart, getTotals, removeDiscount, updateProduct } from '../store/cartSlice';
 import { OrderDataProps, createOrder, createOrderCartToCustomer, removeCart } from '../store/orderSlice';
 import { useGetECommerceProductQuery, useGetECommerceCouponQuery, useCreateConversionTrackingMutation } from '../CheckoutApi';
 import { useAppDispatch } from 'app/store/store';
@@ -889,31 +889,6 @@ function CheckoutPage() {
 		}
 
 		dispatch(getTotals())
-	}, [setCustomerData, setCouponData, customer, total])
-
-
-	useDeepCompareEffect(() => {
-
-		if (product) {
-			dispatch(addToCart({
-				...product,
-				quantity: 1,
-				value: Number(product?.priceTaxIncl)
-			}))
-		}
-
-		if (amount && routeParams.id === 'billing') {
-			dispatch(addToCart({
-				id: 1,
-				name: 'Pagamento',
-				image: '',
-				images: [{ id: 1, name: 'Pagamento' }],
-				upProducts: [],
-				quantity: 1,
-				installments: 0,
-				value: Number(amount)
-			}))
-		}
 
 		if (referralCustomer?.referral && referralCustomer?.referral?.status) {
 			dispatch(
@@ -933,6 +908,33 @@ function CheckoutPage() {
 				value: subTotal,
 				code: 'REFERRAL',
 				applied: `${referralCustomer?.referral.discount}%`
+			}))
+		}
+
+	}, [setCustomerData, setCouponData, customer, total])
+
+
+	useDeepCompareEffect(() => {
+		dispatch(clearCart())
+
+		if (product) {
+			dispatch(addToCart({
+				...product,
+				quantity: 1,
+				value: Number(product?.priceTaxIncl)
+			}))
+		}
+
+		if (amount && routeParams.id === 'billing') {
+			dispatch(addToCart({
+				id: 1,
+				name: 'Pagamento',
+				image: '',
+				images: [{ id: 1, name: 'Pagamento' }],
+				upProducts: [],
+				quantity: 1,
+				installments: 0,
+				value: Number(amount)
 			}))
 		}
 

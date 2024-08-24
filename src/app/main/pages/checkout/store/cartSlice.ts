@@ -60,6 +60,14 @@ const cartSlice = createSlice({
       state.products.splice(index, 1)
       updateCartTotals(state)
     },
+    clearCart: state => {
+      state.products = []
+      state.quantity = 0
+      state.discount = { value: 0, code: '', applied: '' }
+      state.subTotal = 0
+      state.total = 0
+      state.shipping = { value: 0, delivery: false, title: '' }
+    },
     setShipping: (state, action) => {
       state.shipping = action.payload
       updateCartTotals(state)
@@ -127,6 +135,7 @@ export const {
   decrementQuantity,
   removeFromCart,
   removeDiscount,
+  clearCart,
   getTotals
 } = cartSlice.actions
 
