@@ -23,6 +23,13 @@ const ShopApi = api
         query: () => ({ url: `/mock-api/ecommerce/shop/products` }),
         providesTags: ['shop_products']
       }),
+      getShopPlans: build.query<
+        GetShopProductsApiResponse,
+        GetShopProductsApiArg
+      >({
+        query: () => ({ url: `/mock-api/ecommerce/shop/plans` }),
+        providesTags: ['shop_products']
+      }),
       deleteShopProducts: build.mutation<
         DeleteShopProductsApiResponse,
         DeleteShopProductsApiArg
@@ -272,6 +279,7 @@ export type EcommerceOrder = {
 
 export const {
   useGetShopProductsQuery,
+  useGetShopPlansQuery,
   useDeleteShopProductsMutation,
   useGetShopProductQuery,
   useUpdateShopProductMutation,

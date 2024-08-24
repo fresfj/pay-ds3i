@@ -113,16 +113,15 @@ function OptionItem({ option, selected, ...other }: OptionItemProps) {
       }}
       {...other}
     >
-      <div className="col-span-2 py-24 px-20 sm:py-32 lg:py-32">
-        <Typography className="text-2xl font-bold">{name}</Typography>
-        <Typography className="text-xl font-semibold">{subDescription}</Typography>
+      <div className="content-center col-span-2 py-24 px-20 sm:py-32 lg:py-32">
+        <Typography className={`text-base lg:text-lg ${selected ? `font-medium` : 'font-light'}`}>{subDescription}</Typography>
       </div>
       <Box
         sx={{
           backgroundColor: 'primary.main',
           backgroundImage: `url(${_.find(images, { id: featuredImageId })?.url})`
         }}
-        className="bg-cover bg-no-repeat bg-center flex flex-col items-center p-8 min-h-192 lg:min-w-200 lg:px-40 lg:py-48"
+        className="bg-cover bg-no-repeat bg-center flex flex-col items-center p-8 min-h-96 lg:min-h-160 lg:min-w-200 lg:px-40 lg:py-48"
       >
       </Box>
     </Paper>

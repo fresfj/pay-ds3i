@@ -247,6 +247,28 @@ export const eCommerceApiMocks = (mock: ExtendedMockAdapter) => {
     })
   })
 
+  mock.onGet('/ecommerce/shop/plans').reply(async () => {
+    const productsRef = firebase
+      .firestore()
+      .collection('products')
+      .where('plan', '==', true)
+
+    return new Promise(async (resolve, reject) => {
+      await productsRef
+        .get()
+        .then(async querySnapshot => {
+          const productsDB = querySnapshot.docs.map((doc, index) => {
+            return doc.data()
+          })
+
+          resolve([200, productsDB])
+        })
+        .catch(error => {
+          resolve([404, 'Requested product do not exist.'])
+        })
+    })
+  })
+
   mock.onGet('/ecommerce/shop/products').reply(async () => {
     const productsRef = firebase
       .firestore()

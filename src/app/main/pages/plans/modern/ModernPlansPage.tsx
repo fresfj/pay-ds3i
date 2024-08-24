@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import ModernPricingItemType from './ModernPricingItemType';
 import { CheckoutPlans } from '../components/CheckoutPlans';
 import { useForm, FormProvider } from 'react-hook-form';
-import { selectFilteredProducts, useGetShopProductsQuery } from '../../product/ShopApi';
+import { selectFilteredProducts, useGetShopPlansQuery } from '../../product/ShopApi';
 import { useSelector } from 'react-redux';
 import { useRouter } from '@fuse/hooks/use-router';
 import { useLocation } from 'react-router-dom';
@@ -23,7 +23,7 @@ function ModernPlansPage() {
 	const [period, setPeriod] = useState<ModernPricingItemType['period']>('month');
 	const methods = useForm();
 	const [sortBy, setSortBy] = useState('featured');
-	const { data, isLoading } = useGetShopProductsQuery();
+	const { data, isLoading } = useGetShopPlansQuery();
 	const products = useSelector(selectFilteredProducts(data, sortBy));
 	const router = useRouter();
 	const location = useLocation()
@@ -45,7 +45,7 @@ function ModernPlansPage() {
 
 	return (
 		<div className="relative flex min-w-0 flex-auto flex-col overflow-hidden">
-			<div className="relative overflow-hidden px-24 pb-48 pt-32 sm:px-64 sm:pb-96 sm:pt-80">
+			<div className="relative overflow-hidden px-4 pb-48 pt-32 sm:px-64 sm:pb-96 sm:pt-80">
 				<svg
 					className="pointer-events-none absolute inset-0 -z-1"
 					viewBox="0 0 960 540"
@@ -79,20 +79,20 @@ function ModernPlansPage() {
 						initial={{ opacity: 0 }}
 						animate={{ opacity: 1, transition: { delay: 0.05 } }}
 					>
-						<h2 className="text-xl font-semibold">PLANOS</h2>
+						<h2 className="text-lg sm:text-xl font-semibold">PLANOS</h2>
 					</motion.div>
 
 					<motion.div
 						initial={{ opacity: 0, y: 40 }}
 						animate={{ opacity: 1, y: 0, transition: { delay: 0.1 } }}
 					>
-						<div className="mt-4 text-center text-4xl font-extrabold leading-tight tracking-tight sm:text-6xl">
+						<div className="mt-4 text-center text-3xl font-extrabold leading-tight tracking-tight sm:text-6xl">
 							Quantas gramas de<br />creatina você consome diariamente?
 						</div>
 					</motion.div>
 				</div>
-				<div className="mt-20 flex justify-center sm:mt-80">
-					<div className="w-full max-w-sm md:max-w-7xl">
+				<div className="relative mt-20 flex justify-center sm:mt-80">
+					<div className="relative w-full max-w-sm md:max-w-7xl">
 						<motion.div
 							initial={{ opacity: 0 }}
 							animate={{ opacity: 1, transition: { delay: 0.2 } }}
@@ -102,16 +102,18 @@ function ModernPlansPage() {
 									{!isLoading &&
 										<>
 											<CheckoutPlans onApplyShipping={handleApplyShipping} options={products} />
-											<div className="container flex flex-col px-40">
-												<Button
-													className="text-xl py-8 transition duration-300 ease-in-out hover:scale-105"
-													variant="contained"
-													color="secondary"
-													onClick={() => methods.handleSubmit(onSubmit)()}
-													fullWidth
-												>
-													Continuar
-												</Button>
+											<div className='sticky bottom-0'>
+												<div className="container flex flex-col px-40">
+													<Button
+														className="text-xl py-8 transition duration-300 ease-in-out hover:scale-105"
+														variant="contained"
+														color="secondary"
+														onClick={() => methods.handleSubmit(onSubmit)()}
+														fullWidth
+													>
+														Continuar
+													</Button>
+												</div>
 											</div>
 										</>
 									}

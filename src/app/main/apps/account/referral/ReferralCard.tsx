@@ -29,6 +29,7 @@ import AvatarGroup from '@mui/material/AvatarGroup';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { useGetAccountsReferralQuery } from '../AccountApi';
+import { User } from 'src/app/auth/user';
 
 function createData(
 	name: string,
@@ -115,12 +116,12 @@ const rows: rowType[] = [
 function ReferralCard() {
 	const dispatch = useAppDispatch();
 	const { copy } = useCopyToClipboard();
-	const user = useSelector(selectUser);
+	const user = useSelector(selectUser) as User;
 	const { t } = useTranslation('accountApp');
 
 	const { data, isLoading } = useGetAccountsReferralQuery(user);
 	const baseURL = `${window.location.protocol}//${window.location.host}`;
-	const fullURL = `${baseURL}?rid=${user.uid}`
+	const fullURL = `${baseURL}/plans?rid=${user.data.customer.id}`
 
 	const onCopy = useCallback(
 		() => {
