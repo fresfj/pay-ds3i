@@ -3,14 +3,14 @@ import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import withRouter from '@fuse/core/withRouter';
 import FuseLoading from '@fuse/core/FuseLoading';
 import { WithRouterProps } from '@fuse/core/withRouter/withRouter';
 import * as React from 'react';
 import { useSelector } from 'react-redux';
 import Box from '@mui/material/Box';
-import { addDiscount, calculateTotalItemsSelector, calculateTotalSelector, clearCart, decrementQuantity, incrementQuantity, itemsCartSelector, removeFromCart, setAddress, setCustomer, setShipping } from '../store/cartSlice';
+import { addDiscount, calculateTotalItemsSelector, calculateTotalSelector, clearCart, decrementQuantity, getStoredCart, incrementQuantity, itemsCartSelector, removeFromCart, setAddress, setCustomer, setShipping } from '../store/cartSlice';
 import { Iconify } from '@fuse/components/iconify';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
@@ -153,14 +153,31 @@ function ProductsTable(props: ProductsTableProps) {
 	const user = useSelector(selectUser);
 	const CARDS_OPTIONS: any[] = []
 	const cart = useSelector(itemsCartSelector);
+
 	const total = useSelector(calculateTotalSelector)
 	const totalItems = useSelector(calculateTotalItemsSelector);
 	const [activeStep, setActiveStep] = useState(0);
 	const [completed, setCompleted] = useState(false);
 	const { t } = useTranslation('shopApp');
 
+	const storedCart = getStoredCart()
+	const isCustomerComplete = storedCart.customer && storedCart.customer.name && storedCart.customer.email && storedCart.customer.cpfCnpj && storedCart.customer.phone;
+	const isAddressComplete = storedCart.address && storedCart.address.address && storedCart.address.addressNumber && storedCart.address.city && storedCart.address.state && storedCart.address.zipCode;
+
+
+	useEffect(() => {
+		if (isCustomerComplete && isAddressComplete) {
+			setActiveStep(2);
+		} else if (isCustomerComplete) {
+			setActiveStep(1);
+		} else {
+			setActiveStep(0);
+		}
+	}, [isCustomerComplete, isAddressComplete]);
+
 	const empty = !cart?.products?.length;
 	const [isOpen, setIsOpen] = useState(false);
+
 
 	const toggleBottomSheet = () => {
 		setIsOpen(!isOpen);
@@ -220,10 +237,13 @@ function ProductsTable(props: ProductsTableProps) {
 		cpfCnpj: cart?.customer?.cpfCnpj || '',
 		addressType: 'Home',
 		addressDefault: false,
+		zipCode: cart?.address?.zipCode || '',
 		address: cart?.address?.address || '',
 		addressNumber: cart?.address?.addressNumber || '',
 		addressComplement: cart?.address?.addressComplement || '',
 		neighborhood: cart?.address?.neighborhood || '',
+		city: cart?.address?.city || '',
+		state: cart?.address?.state || '',
 		delivery: 0,
 		payment: '',
 	};

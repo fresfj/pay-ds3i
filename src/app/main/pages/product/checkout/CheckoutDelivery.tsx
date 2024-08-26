@@ -470,7 +470,7 @@ export function CheckoutDelivery({ options, onApplyShipping, ...other }: Props) 
     if (storedOption?.shipping) {
       setValue('delivery', storedOption.shipping.value);
     }
-    fetchDeliveryOptions();
+    //fetchDeliveryOptions();
   }, [setValue]);
 
   return (

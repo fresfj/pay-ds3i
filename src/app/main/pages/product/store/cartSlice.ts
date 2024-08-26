@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit'
 import { createSelector } from 'reselect'
 const CART_STORAGE_KEY = 'shopApp_cart'
 
-const getStoredCart = () => {
+export const getStoredCart = () => {
   try {
     const storedCart = localStorage.getItem(CART_STORAGE_KEY)
     return storedCart ? JSON.parse(storedCart) : undefined
