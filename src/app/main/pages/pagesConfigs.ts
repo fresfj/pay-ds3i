@@ -10,6 +10,7 @@ import plansPagesConfig from './plans/plansPagesConfig'
 import searchPagesConfig from './search/searchPagesConfig'
 import checkoutPagesConfig from './checkout/CheckoutAppConfig'
 import productPagesConfig from './product/productPagesConfig'
+import whatsappConfig from './whatsapp/whatsappConfig'
 /**
  * The pages routes config.
  */
@@ -17,6 +18,7 @@ const pagesConfigs: FuseRouteConfigsType = [
   ...authenticationPagesConfig,
   checkoutPagesConfig,
   plansPagesConfig,
+  whatsappConfig,
   productPagesConfig,
   comingSoonPagesConfig,
   errorPagesConfig,

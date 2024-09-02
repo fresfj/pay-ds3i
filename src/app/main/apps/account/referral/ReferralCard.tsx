@@ -31,25 +31,6 @@ import clsx from 'clsx';
 import { useGetAccountsReferralQuery } from '../AccountApi';
 import { User } from 'src/app/auth/user';
 
-function createData(
-	name: string,
-	calories: number,
-	value: number,
-	date: string,
-	status: string,
-) {
-	return { name, calories, value, date, status };
-}
-
-const rowsLine = [
-	createData('Fulano da Silva', 159, 6.0, '2024-09-12', 'PENDING'),
-	createData('Fulano da Silva', 237, 9.0, '2024-09-12', 'PENDING'),
-	createData('Fulano da Silva', 262, 16.0, '2024-09-12', 'CONFIRMED'),
-	createData('Fulano da Silva', 305, 3.7, '2024-09-12', 'RECEIVED'),
-	createData('Fulano da Silva', 356, 16.0, '2024-09-12', 'ACTIVE'),
-];
-
-
 
 /**
  * The row type.
@@ -301,7 +282,7 @@ function ReferralCard() {
 			<Paper className="flex flex-col rounded-0 items-center px-24 py-40 sm:px-64 sm:pb-80 sm:pt-52">
 				<div className="mx-auto flex w-full max-w-7xl flex-col items-center text-center">
 
-					{!data && data?.length === 0 ?
+					{data?.length === 0 ?
 						<>
 							<Typography variant='h5' className='text-xl font-medium text-grey-A400'>
 								Você ainda não tem nenhuma indicação registrada
