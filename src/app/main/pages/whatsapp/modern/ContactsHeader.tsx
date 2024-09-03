@@ -21,11 +21,12 @@ import FuseUtils from '@fuse/utils';
 
 type ContactsItemProps = {
 	count?: number;
+	onOpenSettings: () => void
 	onSelectAll: () => void
 	selectedAll: boolean
 };
 
-function ContactsHeader({ count, onSelectAll, selectedAll }: ContactsItemProps) {
+function ContactsHeader({ count, onSelectAll, onOpenSettings, selectedAll }: ContactsItemProps) {
 	const dispatch = useAppDispatch();
 	const searchText = useSelector(selectSearchText);
 
@@ -37,28 +38,41 @@ function ContactsHeader({ count, onSelectAll, selectedAll }: ContactsItemProps) 
 
 	return (
 		<div className="p-24 sm:p-32 w-full">
-			<div className="flex flex-col">
-				<motion.span
-					initial={{ x: -20 }}
-					animate={{ x: 0, transition: { delay: 0.2 } }}
-				>
-					<Typography className="text-24 md:text-32 font-extrabold tracking-tight leading-none">
-						Contatos
-					</Typography>
-				</motion.span>
-				<motion.span
-					initial={{ y: -20, opacity: 0 }}
-					animate={{ y: 0, opacity: 1, transition: { delay: 0.2 } }}
-				>
-					<Typography
-						component={motion.span}
-						className="text-14 font-medium ml-2"
-						color="text.secondary"
+			<div className="flex flex-col w-full sm:flex-row flex-auto justify-between">
+				<div className="flex flex-col">
+					<motion.span
+						initial={{ x: -20 }}
+						animate={{ x: 0, transition: { delay: 0.2 } }}
 					>
-						{`você tem ${count} ${count === 1 ? `Contato` : `Contatos`}`}
-						{` e você poderá ganhar até ${FuseUtils.formatCurrency(count * 20)} com indicações.`}
-					</Typography>
-				</motion.span>
+						<Typography className="text-24 md:text-32 font-extrabold tracking-tight leading-none">
+							Contatos
+						</Typography>
+					</motion.span>
+					<motion.span
+						initial={{ y: -20, opacity: 0 }}
+						animate={{ y: 0, opacity: 1, transition: { delay: 0.2 } }}
+					>
+						<Typography
+							component={motion.span}
+							className="text-14 font-medium ml-2"
+							color="text.secondary"
+						>
+							{`você tem ${count} ${count === 1 ? `Contato` : `Contatos`}`}
+							{` e você poderá ganhar até ${FuseUtils.formatCurrency(count * 20)} com indicações.`}
+						</Typography>
+					</motion.span>
+				</div>
+				<div className="flex items-center space-x-12">
+					<Button
+						onClick={onOpenSettings}
+						className="whitespace-nowrap"
+						variant="outlined"
+						color="primary"
+						startIcon={<FuseSvgIcon size={20}>heroicons-solid:cog</FuseSvgIcon>}
+					>
+						Configuração
+					</Button>
+				</div>
 			</div>
 			<div className="flex flex-1 items-center mt-16 -mx-8">
 
@@ -100,10 +114,10 @@ function ContactsHeader({ count, onSelectAll, selectedAll }: ContactsItemProps) 
 					</div> */}
 					<Button
 						onClick={onSelectAll}
-						className="px-12 text-lg whitespace-nowrap"
+						className="px-12 whitespace-nowrap"
 						color="secondary"
 						variant="contained"
-						endIcon={
+						startIcon={
 							selectedAll ? <Iconify icon="eva:radio-button-off-fill" /> : <Iconify icon="eva:checkmark-circle-2-fill" />
 						}
 					>

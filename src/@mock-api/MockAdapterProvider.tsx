@@ -28,7 +28,7 @@ import { tasksApiMocks } from './api/tasks-api';
 import { profileApiMocks } from './api/profile-api';
 import { calendarApiMocks } from './api/calendar-api';
 import { accountApiMocks } from './api/account-api';
-
+import { instanceApiMocks } from './api/instance-api';
 const mockAdapterOptions = {
 	delayResponse: 0
 };
@@ -59,6 +59,7 @@ function MockAdapterProvider(props: MockAdapterProviderProps) {
 				iconsApiMocks,
 				academyApiMocks,
 				authApiMocks,
+				instanceApiMocks,
 				accountApiMocks,
 				calendarApiMocks,
 				contactsApiMocks,

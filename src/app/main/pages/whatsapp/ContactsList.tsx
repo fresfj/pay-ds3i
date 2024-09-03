@@ -30,6 +30,10 @@ function ContactsList({ contacts, data, onChangeContact }: ContactsProps) {
 	const [share, setShare] = useState(false);
 	const containerRef = useRef(null);
 
+	const [visibleCount, setVisibleCount] = useState(24);
+	const showMoreContacts = () => {
+		setVisibleCount(prevCount => prevCount + 24);
+	};
 
 	const container = {
 		show: {
@@ -51,7 +55,6 @@ function ContactsList({ contacts, data, onChangeContact }: ContactsProps) {
 	const [inviteEmail, setInviteEmail] = useState('');
 
 	const handleOpenShareDialog = () => {
-		console.log(`ssss`)
 		setShare(true);
 	};
 
@@ -117,10 +120,10 @@ function ContactsList({ contacts, data, onChangeContact }: ContactsProps) {
 							md: 'repeat(3, 1fr)',
 							lg: 'repeat(4, 1fr)',
 						}}
-						gap={3}
+						gap={2}
 					>
 
-						{data.map((contact, index) => {
+						{data.slice(0, visibleCount).map((contact, index) => {
 							const selected = contacts.includes(contact.id);
 							return (
 								<Paper
@@ -169,7 +172,20 @@ function ContactsList({ contacts, data, onChangeContact }: ContactsProps) {
 							)
 						})}
 					</Box>
-
+					{visibleCount < data.length && (
+						<div className="flex flex-col flex-auto w-full text-center">
+							<Stack spacing={2} sx={{ flexWrap: 'wrap', mt: 4, justifyContent: "center", alignItems: 'center' }}>
+								<Button
+									size='large'
+									onClick={showMoreContacts}
+									variant="contained"
+									color="secondary"
+									startIcon={<Iconify icon="solar:refresh-bold-duotone" />}>
+									Mostrar Mais
+								</Button>
+							</Stack>
+						</div>
+					)}
 
 				</Collapse>
 			</motion.div>
@@ -182,12 +198,12 @@ function ContactsList({ contacts, data, onChangeContact }: ContactsProps) {
 					action={
 						<Button
 							color="primary"
-							size="small"
+							size="large"
 							variant="contained"
 							startIcon={<Iconify icon="solar:share-bold" />}
 							onClick={handleOpenShareDialog}
 						>
-							Compartir
+							Compartilhar
 						</Button>
 					}
 				/>
