@@ -15,12 +15,14 @@ import UserInterfaceConfigs from '../main/user-interface/UserInterfaceConfigs';
 import DocumentationConfig from '../main/documentation/DocumentationConfig';
 import authRoleExamplesConfigs from '../main/auth/authRoleExamplesConfigs';
 import forgotPasswordPagesConfig from '../main/forgot-password/forgotPasswordPagesConfig'
+import IndicationConfig from '../main/indique/IndicationConfig';
 
 const routeConfigs: FuseRouteConfigsType = [
 	SignOutConfig,
 	SignInConfig,
 	SignUpConfig,
 	forgotPasswordPagesConfig,
+	IndicationConfig,
 
 	Error404PageConfig,
 	DocumentationConfig,
