@@ -13,7 +13,7 @@ import Stack from '@mui/material/Stack';
 import { Scrollbar } from '@fuse/components/scrollbar';
 import { Iconify } from '@fuse/components/iconify';
 import { MessageTemplate } from './MessageTemplate';
-import { Avatar, Badge, Card, CardMedia, DialogContent, Grid, ListItemText, Tooltip, tooltipClasses, TooltipProps, Typography } from '@mui/material';
+import { Avatar, Badge, Card, CardMedia, DialogContent, Grid, IconButton, ListItemText, Tooltip, tooltipClasses, TooltipProps, Typography } from '@mui/material';
 import axios from 'axios';
 import FuseUtils from '@fuse/utils';
 import { useEffect, useRef, useState } from 'react';
@@ -383,6 +383,28 @@ export function InstanceDialog({
     <>
       <Dialog fullWidth maxWidth="md" open={open} onClose={onClose} {...other}>
         <DialogTitle className='text-center text-4xl font-bold'>Sincronize com o seu WhatsApp</DialogTitle>
+        <Tooltip title="Fechar" slotProps={{ popper: { modifiers: [{ name: 'offset', options: { offset: [0, -10], }, },], }, }}>
+          <IconButton
+            size='large'
+            color='inherit'
+            aria-label="close"
+            onClick={onClose}
+            sx={(theme) => ({
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              backgroundColor: theme.palette.grey[200],
+              color: theme.palette.grey[600],
+              transition: 'background-color 0.3s, color 0.3s',
+              '&:hover': {
+                backgroundColor: theme.palette.grey[300],
+                color: theme.palette.grey[900],
+              },
+            })}
+          >
+            <Iconify icon="mingcute:close-line" sx={{ width: 26, height: 26 }} />
+          </IconButton>
+        </Tooltip>
         <DialogContent>
           <Grid container spacing={2}
             sx={{

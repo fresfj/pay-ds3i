@@ -1,0 +1,16 @@
+@font-face {
+  font-family: 'Cera Pro';
+  font-weight: 100 400;
+  font-display: swap;
+  font-style: normal;
+  font-named-instance: 'Regular';
+  src: url('CeraPro-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Cera Pro';
+  font-weight: 500 900;
+  font-display: swap;
+  font-style: normal;
+  src: url('CeraPro-Medium.woff2') format('woff2');
+}

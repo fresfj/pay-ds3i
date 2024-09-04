@@ -71,11 +71,11 @@ function WhatsappApp() {
 	const checkbox = useBoolean();
 
 	const onChangeContact = useCallback(
-		(contactId: string) => {
+		(contactId: string, contactName: string, contactOwner: string) => {
 			setCurrentContact(prevSelected =>
-				prevSelected.includes(contactId)
-					? prevSelected.filter(id => id !== contactId)
-					: [...prevSelected, contactId]
+				prevSelected.some(contact => contact.id === contactId)
+					? prevSelected.filter(contact => contact.id !== contactId)
+					: [...prevSelected, { id: contactId, name: contactName, owner: contactOwner }]
 			);
 		},
 		[]
@@ -85,7 +85,11 @@ function WhatsappApp() {
 		if (currentContact.length === contacts.length) {
 			setCurrentContact([]);
 		} else {
-			setCurrentContact(contacts.map(contact => contact.id));
+			setCurrentContact(contacts.map(contact => ({
+				id: contact.id,
+				name: contact.pushName,
+				owner: contact.owner
+			})));
 		}
 	};
 
@@ -142,8 +146,6 @@ function WhatsappApp() {
 	}
 
 
-
-	console.log(share)
 	if (contacts?.length === 0) {
 		return (
 			<InstanceDialog

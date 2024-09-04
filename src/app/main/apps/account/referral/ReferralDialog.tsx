@@ -13,7 +13,7 @@ import axios from 'axios';
 
 import { Scrollbar } from '@fuse/components/scrollbar';
 import { Iconify } from '@fuse/components/iconify';
-import { MessageTemplate } from './MessageTemplate';
+
 import { Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 
@@ -36,49 +36,24 @@ const MODEL = [
 
 type Props = DialogProps & {
   open: boolean;
-  selected?: string[];
   onClose?: () => void;
-  inviteEmail?: string;
-  onCopyLink?: () => void;
-  shared?: any[] | null;
   onChangeInvite?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
-export function ShareDialog({
+export function ReferralDialog({
   open,
-  shared,
-  selected,
   onClose,
-  onCopyLink,
-  inviteEmail,
   onChangeInvite,
   ...other
 }: Props) {
-  const hasShared = shared && !!shared.length;
+
   const methods = useForm();
   const [isLoading, setIsLoading] = useState(false);
   const [templateModel, setTemplateModel] = useState(null);
 
   const handleSendContacts = async () => {
     setIsLoading(true);
-    const templateId = methods.getValues('template');
 
-    const template = MODEL.find(item => item.id === templateId);
-    if (!template) {
-      throw new Error(`Template com ID ${templateId} não encontrado`);
-    }
-
-    const formattedMessages = selected.map((contact: any) => {
-      const message = template.message
-        .replace('[nome do amigo]', `*${contact.name}*`)
-      return {
-        phone: contact.id,
-        owner: contact.owner,
-        mensagem: message,
-      };
-    });
-
-    sendMessages(formattedMessages)
   }
 
   const sendMessages = async (data) => {
@@ -92,27 +67,23 @@ export function ShareDialog({
     }
   }
 
-  const handleApplyShipping = (e) => {
-    //setTemplateModel(e)
+  const handleApply = (e) => {
+
   }
 
-  useEffect(() => {
-    setIsLoading(false);
-  }, [])
-
   return (
-    <Dialog fullWidth maxWidth="lg" open={open} onClose={onClose} {...other}>
+    <Dialog fullWidth maxWidth="md" open={open} onClose={onClose} {...other}>
       <Stack sx={{ px: 3, mb: 4, mt: 6, textAlign: 'center' }} direction="column" className='mx-80' alignItems="center">
         <Typography component={'h3'} className='m-0 font-semibold' variant="h4">
-          Escolha o modelo de mensagem
+          Indique a Creabox e ganhe
         </Typography>
         <Typography component={'h4'} variant="subtitle1" gutterBottom>
-          Selecione um dos modelos disponíveis para compartilhar com seus amigos. Certifique-se de escolher a mensagem que melhor se encaixa na sua recomendação para garantir uma comunicação clara e eficaz.
+          A indicação só é válida após a realização da primeira venda do plano da Creabox
         </Typography>
       </Stack>
       <FormProvider {...methods}>
         <form>
-          <MessageTemplate onApplyShipping={handleApplyShipping} templates={MODEL} />
+
         </form>
       </FormProvider>
 
@@ -125,12 +96,12 @@ export function ShareDialog({
 
         <Button
           size="large"
-          color="success"
+          color="secondary"
           variant="contained"
-          onClick={handleSendContacts}
+          onClick={handleApply}
           disabled={isLoading}
         >
-          {isLoading ? 'Enviando...' : 'Enviar e ganhar'}
+          {isLoading ? 'Enviando...' : 'Começar e ganhar'}
         </Button>
       </DialogActions>
     </Dialog>

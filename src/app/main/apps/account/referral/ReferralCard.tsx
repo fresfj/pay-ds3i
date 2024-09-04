@@ -5,7 +5,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { Iconify } from '@fuse/components/iconify';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useAppDispatch } from 'app/store/store';
 import { showMessage } from '@fuse/core/FuseMessage/store/fuseMessageSlice';
 import { useCopyToClipboard } from '@fuse/hooks/use-copy-to-clipboard';
@@ -23,14 +23,56 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { Avatar, Divider, lighten, TableSortLabel, Tooltip } from '@mui/material';
+import { Avatar, Divider, lighten, Slider, styled, TableSortLabel, Tooltip, useTheme } from '@mui/material';
 import AvatarGroup from '@mui/material/AvatarGroup';
 
+import { m, useScroll, useSpring, useTransform, useMotionValueEvent } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 import { useGetAccountsReferralQuery } from '../AccountApi';
 import { User } from 'src/app/auth/user';
+import { textGradient } from 'src/theme/styles';
+import { ReferralDialog } from './ReferralDialog';
 
+
+const PrettoSlider = styled(Slider)({
+	color: '#5b41b9',
+	height: 8,
+	'& .MuiSlider-track': {
+		border: 'none',
+	},
+	'& .MuiSlider-thumb': {
+		height: 32,
+		width: 32,
+		backgroundColor: '#fff',
+		border: '2px solid currentColor',
+		'&:focus, &:hover, &.Mui-active, &.Mui-focusVisible': {
+			boxShadow: 'inherit',
+		},
+		'&::before': {
+			display: 'none',
+		},
+	},
+	'& .MuiSlider-valueLabel': {
+		lineHeight: 1.2,
+		fontSize: 12,
+		background: 'unset',
+		padding: 0,
+		width: 32,
+		height: 32,
+		borderRadius: '50% 50% 50% 0',
+		backgroundColor: '#5b41b9',
+		transformOrigin: 'bottom left',
+		transform: 'translate(50%, -100%) rotate(-45deg) scale(0)',
+		'&::before': { display: 'none' },
+		'&.MuiSlider-valueLabelOpen': {
+			transform: 'translate(50%, -100%) rotate(-45deg) scale(1)',
+		},
+		'& > *': {
+			transform: 'rotate(45deg)',
+		},
+	},
+});
 
 /**
  * The row type.
@@ -91,18 +133,48 @@ const rows: rowType[] = [
 	}
 ];
 
+function valueLabelFormat(value: number) {
+	if (value === 1) {
+		return `por indicação`
+	} else {
+		return `com ${value} indicações`;
+	}
+
+}
+
+function calculateValue(value: number) {
+	const ganhoPorIndicacao = 20;
+	return value * ganhoPorIndicacao;
+}
+
 /**
  * The Referral card component.
  */
 function ReferralCard() {
+	const theme = useTheme();
 	const dispatch = useAppDispatch();
 	const { copy } = useCopyToClipboard();
 	const user = useSelector(selectUser) as User;
 	const { t } = useTranslation('accountApp');
-
+	const [open, setOpen] = useState<boolean>(false);
+	const [value, setValue] = useState<number>(25);
 	const { data, isLoading } = useGetAccountsReferralQuery(user);
 	const baseURL = `${window.location.protocol}//${window.location.host}`;
 	const fullURL = `${baseURL}/plans?rid=${user.data.customer.id}`
+
+	const handleChange = (event: Event, newValue: number | number[]) => {
+		if (typeof newValue === 'number') {
+			setValue(newValue);
+		}
+	};
+
+	const handleOpenDialog = () => {
+		setOpen(true);
+	};
+
+	const handleCloseDialog = () => {
+		setOpen(false);
+	};
 
 	const onCopy = useCallback(
 		() => {
@@ -128,7 +200,7 @@ function ReferralCard() {
 
 	return (
 		<div className="relative flex min-w-0 flex-auto flex-col overflow-hidden">
-			<div className="flex flex-col container items-center px-24 sm:px-64 pb-32 pt-12 sm:pb-52 sm:pt-60">
+			<div className="flex flex-col container items-center px-24 sm:px-64 pb-32 pt-12 sm:pb-52 sm:pt-36">
 				<Card sx={{ display: { md: 'flex', sx: 'none' }, width: '100%', mx: 4 }}>
 					<CardMedia
 						component="img"
@@ -180,7 +252,67 @@ function ReferralCard() {
 					</Box>
 				</Card>
 			</div>
-			<div id='section-end' className="flex flex-col items-center px-24 pb-44 pt-32 sm:px-64 sm:pb-88 sm:pt-64">
+			<Box
+				sx={{ backgroundColor: 'primary.main', color: 'primary.contrastText', mt: 4 }}
+				className="px-24 py-40 sm:px-64 sm:py-48 "
+			>
+				<div id='section-end' className="flex flex-col items-center px-24 sm:px-64">
+					<div className="w-full max-w-7xl">
+						<div className="grid w-full grid-cols-1 text-center md:text-start gap-x-24 items-center gap-y-48 sm:grid-cols-2 lg:gap-x-64">
+							<div>
+								<Typography variant='h4' component="div" className='m-0' gutterBottom>
+									Você pode ganhar
+								</Typography>
+								<Box
+									component={m.span}
+									animate={{ backgroundPosition: '200% center' }}
+									transition={{
+										duration: 20,
+										ease: 'linear',
+										repeat: Infinity,
+										repeatType: 'reverse',
+									}}
+									className="text-9xl font-500 font-['Cera_Pro']"
+									sx={{
+										...textGradient(
+											`300deg, ${theme.palette.secondary.main} 0%, #5b41b9 25%, ${theme.palette.secondary.main} 50%, #5b41b9 75%, ${theme.palette.secondary.main} 100%`
+										),
+										backgroundSize: '400%'
+									}}
+								>
+									R$ {calculateValue(value).toLocaleString('pt-BR')}
+								</Box>
+								<Typography variant='h5' component="div" className="leading-5 font-['Cera_Pro']" gutterBottom>
+									{valueLabelFormat(value)}
+								</Typography>
+								<PrettoSlider
+									value={value}
+									min={1}
+									step={1}
+									max={50}
+									scale={calculateValue}
+									getAriaValueText={valueLabelFormat}
+									valueLabelFormat={valueLabelFormat}
+									onChange={handleChange}
+									valueLabelDisplay="off"
+									aria-labelledby="non-linear-slider"
+								/>
+
+								<Typography variant='body2' className='text-lg'>
+									Ganhe muito dinheiro indicando os planos da CREABOX! A pessoa que adquirir por sua indicação recebe R$10 de desconto adicional no site</Typography>
+							</div>
+							<CardMedia
+								component="img"
+								className='overflow-visible'
+								sx={{ height: '40vh' }}
+								image="assets/images/etc/MessageConversation.png"
+								alt="Live from space album cover"
+							/>
+						</div>
+					</div>
+				</div>
+			</Box>
+			<div id='section-end' className="flex flex-col items-center px-24 pb-44 pt-32 sm:px-64 sm:pb-64 sm:pt-64">
 				<div className="w-full max-w-7xl">
 					<div>
 						<Typography className="text-4xl font-extrabold leading-tight tracking-tight">
@@ -236,6 +368,17 @@ function ReferralCard() {
 							</Typography>
 
 						</div>
+					</div>
+					<div className="mx-auto flex w-full max-w-7xl flex-col items-center text-center mt-36">
+						<Button
+							onClick={handleOpenDialog}
+							className="mt-32 px-48 text-xl"
+							size="large"
+							color="secondary"
+							variant="contained"
+						>
+							Indique agora
+						</Button>
 					</div>
 				</div>
 			</div>
@@ -394,6 +537,10 @@ function ReferralCard() {
 					}
 				</div>
 			</Paper>
+			<ReferralDialog
+				open={open}
+				onClose={() => { handleCloseDialog() }}
+			/>
 		</div>
 	);
 

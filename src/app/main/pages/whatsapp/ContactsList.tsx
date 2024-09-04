@@ -19,7 +19,7 @@ import { ShareDialog } from './components/ShareDialog';
 type ContactsProps = {
 	contacts?: any[]
 	data?: any[]
-	onChangeContact: (id: string) => void
+	onChangeContact: (id: string, name: string, owner: string) => void
 };
 
 /**
@@ -55,6 +55,7 @@ function ContactsList({ contacts, data, onChangeContact }: ContactsProps) {
 	const [inviteEmail, setInviteEmail] = useState('');
 
 	const handleOpenShareDialog = () => {
+		console.log(`contacts`, contacts)
 		setShare(true);
 	};
 
@@ -122,9 +123,8 @@ function ContactsList({ contacts, data, onChangeContact }: ContactsProps) {
 						}}
 						gap={2}
 					>
-
 						{data.slice(0, visibleCount).map((contact, index) => {
-							const selected = contacts.includes(contact.id);
+							const selected = contacts.some(selectedContact => selectedContact.id === contact.id);
 							return (
 								<Paper
 									variant="outlined"
@@ -146,7 +146,7 @@ function ContactsList({ contacts, data, onChangeContact }: ContactsProps) {
 											boxShadow: theme.customShadows.z20,
 										})
 									}}
-									onClick={() => onChangeContact(contact.id)}
+									onClick={() => onChangeContact(contact.id, contact.pushName, contact.owner)}
 								>
 									<div className="flex flex-col flex-auto w-full">
 										<Box sx={{ gap: 2, display: 'flex', alignItems: 'center' }}>
@@ -211,6 +211,7 @@ function ContactsList({ contacts, data, onChangeContact }: ContactsProps) {
 
 			<ShareDialog
 				open={share}
+				selected={contacts}
 				inviteEmail={inviteEmail}
 				onChangeInvite={handleChangeInvite}
 				onClose={() => {
