@@ -229,16 +229,28 @@ function ReferralCard() {
 							</ol>
 						</CardContent>
 						<Box sx={{ display: 'flex', alignItems: 'center', pl: 1, pb: 1 }}>
-							<Button
-								className="mx-8 whitespace-nowrap text-xl"
-								variant="contained"
-								color="secondary"
-								endIcon={<Iconify icon="solar:copy-bold-duotone" />}
+							{user.data.customer.referral ?
+								<Button
+									className="mx-8 whitespace-nowrap text-xl"
+									variant="contained"
+									color="secondary"
+									endIcon={<Iconify icon="solar:copy-bold-duotone" />}
 
-								onClick={() => { onCopy() }}
-							>
-								<span className="hidden sm:flex mx-8">Seu link</span>
-							</Button>
+									onClick={() => { onCopy() }}
+								>
+									<span className="hidden sm:flex mx-8">Seu link</span>
+								</Button>
+								:
+								<Button
+									onClick={handleOpenDialog}
+									className="mx-8 whitespace-nowrap text-xl"
+									variant="contained"
+									color="secondary"
+									endIcon={<Iconify icon="solar:chat-round-money-bold-duotone" />}
+								>
+									Indique agora
+								</Button>
+							}
 							<Button
 								className="mx-8 whitespace-nowrap text-xl"
 								variant="outlined"
@@ -489,9 +501,8 @@ function ReferralCard() {
 													<div className="flex items-center">
 														<AvatarGroup max={2}>
 															{row.products.map((product, index) => (
-																<Stack direction="row" alignItems="center" spacing={0.5} >
+																<Stack key={index} direction="row" alignItems="center" spacing={0.5} >
 																	<Avatar
-																		key={index}
 																		alt={product.name}
 																		className='inline-block rounded-lg ring-2 ring-white bg-white'
 																		src={_.find(product.images, { id: product.featuredImageId })?.url}

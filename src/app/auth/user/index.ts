@@ -3,6 +3,16 @@ import { FuseSettingsConfigType } from '@fuse/core/FuseSettings/FuseSettings'
 export type CustomerType = {
   displayName: string
   id?: string
+  referral?: {
+    pix: {
+      pixAddressKeyType: boolean
+      pixAddressKey: boolean
+    }
+    acceptTerms: boolean
+    discount: number
+    labels: string[] | string | null
+    status: boolean
+  }
 }
 /**
  * The type definition for a user object.

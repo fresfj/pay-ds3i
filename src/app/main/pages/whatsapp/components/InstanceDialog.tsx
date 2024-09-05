@@ -1,18 +1,13 @@
 import type { DialogProps } from '@mui/material/Dialog';
-import clsx from 'clsx';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
-import TextField from '@mui/material/TextField';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogActions from '@mui/material/DialogActions';
-import InputAdornment from '@mui/material/InputAdornment';
 import { useForm, FormProvider } from 'react-hook-form';
 import Stack from '@mui/material/Stack';
 
-import { Scrollbar } from '@fuse/components/scrollbar';
 import { Iconify } from '@fuse/components/iconify';
-import { MessageTemplate } from './MessageTemplate';
 import { Avatar, Badge, Card, CardMedia, DialogContent, Grid, IconButton, ListItemText, Tooltip, tooltipClasses, TooltipProps, Typography } from '@mui/material';
 import axios from 'axios';
 import FuseUtils from '@fuse/utils';
@@ -20,7 +15,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useCreateInstanceMutation } from '../InstanceApi';
 import styled from '@mui/styles/styled';
 import FuseLoading from '@fuse/core/FuseLoading';
-import { Label } from '@fuse/components/label';
 import { useAppDispatch } from 'app/store/store';
 import { clearDataApp, contactsSelector, setContactsApp, setInstanceApp, setProfileApp } from '../store/InstanceSlice';
 import { useSelector } from 'react-redux';

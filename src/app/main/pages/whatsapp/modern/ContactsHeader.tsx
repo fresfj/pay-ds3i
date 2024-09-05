@@ -58,7 +58,15 @@ function ContactsHeader({ count, onSelectAll, onOpenSettings, selectedAll }: Con
 							color="text.secondary"
 						>
 							{`você tem ${count} ${count === 1 ? `Contato` : `Contatos`}`}
-							{` e você poderá ganhar até ${FuseUtils.formatCurrency(count * 20)} com indicações.`}
+							{` e você poderá ganhar até `}
+							<Typography
+								component={motion.span}
+								className="text-lg font-medium ml-2"
+								color="text.secondary"
+							>
+								{FuseUtils.formatCurrency(count * 20)}
+							</Typography>
+							{`  com indicações.`}
 						</Typography>
 					</motion.span>
 				</div>

@@ -168,8 +168,10 @@ function WhatsappApp() {
 				<div className="w-full p-12 pt-16 sm:pt-24 lg:ltr:pr-0 lg:rtl:pl-0">
 					<ContactsList
 						data={filteredData}
+						all={contacts?.length}
 						contacts={currentContact}
 						onChangeContact={onChangeContact}
+						onSelectAll={handleSelectAll}
 					/>
 					<InstanceDialog
 						open={share}

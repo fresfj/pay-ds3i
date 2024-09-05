@@ -10,8 +10,6 @@ import Checkbox from '@mui/material/Checkbox';
 import { Iconify } from '@fuse/components/iconify';
 import Button from '@mui/material/Button';
 import { ContactsActionSelected } from './components/ContactsActionSelected';
-import { useSelector } from 'react-redux';
-import { selectFilteredContactList } from './WhatsappApi';
 import { useBoolean } from '@fuse/hooks/use-boolean';
 import { useTheme } from '@mui/material/styles';
 import { ShareDialog } from './components/ShareDialog';
@@ -19,14 +17,15 @@ import { ShareDialog } from './components/ShareDialog';
 type ContactsProps = {
 	contacts?: any[]
 	data?: any[]
+	all?: number
 	onChangeContact: (id: string, name: string, owner: string) => void
+	onSelectAll?: () => void
 };
 
 /**
  * The ContactsList component.
  */
-function ContactsList({ contacts, data, onChangeContact }: ContactsProps) {
-	const [selectContact, setSelectContact] = useState<any>();
+function ContactsList({ contacts, data, all, onSelectAll, onChangeContact }: ContactsProps) {
 	const [share, setShare] = useState(false);
 	const containerRef = useRef(null);
 
@@ -49,13 +48,10 @@ function ContactsList({ contacts, data, onChangeContact }: ContactsProps) {
 	};
 
 	const theme = useTheme();
-	const checkbox = useBoolean();
-
 
 	const [inviteEmail, setInviteEmail] = useState('');
 
 	const handleOpenShareDialog = () => {
-		console.log(`contacts`, contacts)
 		setShare(true);
 	};
 
@@ -110,7 +106,6 @@ function ContactsList({ contacts, data, onChangeContact }: ContactsProps) {
 				variants={container}
 				initial="hidden"
 				animate="show"
-			//className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-24 w-full min-w-0"
 			>
 				<Collapse in={true} unmountOnExit>
 					<Box
@@ -138,11 +133,13 @@ function ContactsList({ contacts, data, onChangeContact }: ContactsProps) {
 										borderRadius: 2,
 										cursor: 'pointer',
 										position: 'relative',
-										bgcolor: 'transparent',
+										bgcolor: 'rgb(248 250 252)',
+										border: '1px solid transparent',
 										flexDirection: 'column',
 										alignItems: 'flex-start',
 										...((selected) && {
 											bgcolor: 'background.paper',
+											border: '1px solid rgb(203 213 225)',
 											boxShadow: theme.customShadows.z20,
 										})
 									}}
@@ -192,12 +189,14 @@ function ContactsList({ contacts, data, onChangeContact }: ContactsProps) {
 
 			{!!contacts?.length && (
 				<ContactsActionSelected
+					all={all}
 					numSelected={contacts.length}
 					rowCount={contacts.length}
 					selected={contacts}
+					onSelectAllItems={onSelectAll}
 					action={
 						<Button
-							color="primary"
+							color="secondary"
 							size="large"
 							variant="contained"
 							startIcon={<Iconify icon="solar:share-bold" />}
