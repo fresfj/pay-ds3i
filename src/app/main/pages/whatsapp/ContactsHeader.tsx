@@ -8,7 +8,7 @@ import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { ChangeEvent, useEffect, useState } from 'react';
 import NavLinkAdapter from '@fuse/core/NavLinkAdapter';
 import { useSelector } from 'react-redux';
-import { resetSearchText, selectSearchText, setSearchText } from '../store/searchTextSlice';
+import { resetSearchText, selectSearchText, setSearchText } from './store/searchTextSlice';
 import Box from '@mui/material/Box';
 import Checkbox from '@mui/material/Checkbox';
 import { Iconify } from '@fuse/components/iconify';

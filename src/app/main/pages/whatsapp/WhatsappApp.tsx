@@ -1,15 +1,9 @@
 import FusePageSimple from '@fuse/core/FusePageSimple';
-import Tab from '@mui/material/Tab';
-import Tabs from '@mui/material/Tabs';
 import { useCallback, useRef, useState } from 'react';
-import Box from '@mui/material/Box';
 import { styled, useTheme } from '@mui/material/styles';
 import * as React from 'react';
 import FuseLoading from '@fuse/core/FuseLoading';
-import ContactsHeader from './modern/ContactsHeader';
-import { useBoolean } from '@fuse/hooks/use-boolean';
-import axios from 'axios';
-import FuseUtils from '@fuse/utils';
+import ContactsHeader from './ContactsHeader';
 import { useSelector } from 'react-redux';
 import { selectFilteredContactList, selectGroupedFilteredContacts } from './WhatsappApi';
 import ContactsList from './ContactsList';
@@ -34,19 +28,8 @@ function WhatsappApp() {
 
 	const groupedFilteredCustomers = useSelector(selectGroupedFilteredContacts(filteredData));
 	const [currentContact, setCurrentContact] = useState<any[]>([]);
-	const [selectContact, setSelectContact] = useState<any>();
 	const [share, setShare] = useState(contacts?.length === 0 ? true : false);
 	const [inviteEmail, setInviteEmail] = useState('');
-	const containerRef = useRef(null);
-
-
-	const token = '7fd370f4caddb0db67f1c3965830f963'
-	const config = {
-		headers: {
-			'Content-Type': 'application/json',
-			'apikey': token
-		}
-	}
 
 	const container = {
 		show: {
@@ -60,15 +43,6 @@ function WhatsappApp() {
 		hidden: { opacity: 0, y: 100 },
 		show: { opacity: 1, y: 0 }
 	};
-
-	const handleSendContacts = async () => {
-		const response = await axios.post('https://n8n.parceriasdenegocios.com.br/webhook-test/testeenvioo', contacts)
-
-		console.log(`response`, response)
-	}
-
-	const theme = useTheme();
-	const checkbox = useBoolean();
 
 	const onChangeContact = useCallback(
 		(contactId: string, contactName: string, contactOwner: string) => {
@@ -107,44 +81,6 @@ function WhatsappApp() {
 	const handleChangeInvite = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
 		setInviteEmail(event.target.value);
 	}, []);
-
-	function stringToColor(string: string) {
-		let hash = 0;
-		let i;
-
-		for (i = 0; i < string.length; i += 1) {
-			hash = string.charCodeAt(i) + ((hash << 5) - hash);
-		}
-
-		let color = '#';
-
-		for (i = 0; i < 3; i += 1) {
-			const value = (hash >> (i * 8)) & 0xff;
-			color += `00${value.toString(16)}`.slice(-2);
-		}
-		return color;
-	}
-
-	function stringAvatar(name: string) {
-		const nameParts = name.split(' ');
-		let initials;
-		if (nameParts.length === 1) {
-			initials = `${nameParts[0][0]}${nameParts[0][0]}`;
-		} else {
-			initials = `${nameParts[0][0]}${nameParts[1][0]}`;
-		}
-
-		return {
-			sx: {
-				mx: 'auto',
-				width: { xs: 64, md: 82 },
-				height: { xs: 64, md: 82 },
-				bgcolor: stringToColor(name),
-			},
-			children: initials,
-		};
-	}
-
 
 	if (contacts?.length === 0) {
 		return (
