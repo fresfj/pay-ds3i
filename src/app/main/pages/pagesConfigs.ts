@@ -11,12 +11,14 @@ import searchPagesConfig from './search/searchPagesConfig'
 import checkoutPagesConfig from './checkout/CheckoutAppConfig'
 import productPagesConfig from './product/productPagesConfig'
 import whatsappConfig from './whatsapp/whatsappConfig'
+import instagramAppConfig from './instagram/instagramAppConfig'
 /**
  * The pages routes config.
  */
 const pagesConfigs: FuseRouteConfigsType = [
   ...authenticationPagesConfig,
   checkoutPagesConfig,
+  instagramAppConfig,
   plansPagesConfig,
   whatsappConfig,
   productPagesConfig,

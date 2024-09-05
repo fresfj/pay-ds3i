@@ -247,6 +247,13 @@ const navigationConfig: FuseNavItemType[] = [
             end: true
           },
           {
+            id: 'instagram',
+            title: 'Instagram',
+            type: 'item',
+            url: 'apps/settings/instagram',
+            end: true
+          },
+          {
             id: 'whatsapp',
             title: 'Whatsapp',
             type: 'item',

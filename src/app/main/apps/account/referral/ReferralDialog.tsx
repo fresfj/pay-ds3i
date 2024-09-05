@@ -55,8 +55,8 @@ export function ReferralDialog({
   const referral = user?.data?.customer?.referral
 
   const defaultValues = {
-    pixAddressKeyType: referral.pix.pixAddressKeyType ? referral.pix.pixAddressKeyType : '',
-    pixAddressKey: referral.pix.pixAddressKey ? referral.pix.pixAddressKey : '',
+    pixAddressKeyType: referral?.pix?.pixAddressKeyType ? referral?.pix?.pixAddressKeyType : '',
+    pixAddressKey: referral?.pix?.pixAddressKey ? referral?.pix?.pixAddressKey : '',
     acceptTerms: referral?.acceptTerms === true,
   }
 
