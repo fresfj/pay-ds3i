@@ -33,7 +33,7 @@ interface HotModule {
 interface Window {
   fbAsyncInit: () => void
   FB: {
-    api: any
+    ui: any
     init: (params: Record<string, any>) => void
     getLoginStatus: any //(callback: (response: any) => void) => void
     login: (

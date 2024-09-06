@@ -164,32 +164,27 @@ export function InstanceDialog({
   const intervalRef = useRef(null);
 
   const contacts = useSelector(contactsSelector);
-
+  const [status, setStatus] = useState('');
   const [isOpenConfirm, setIsOpenConfirm] = useState(false);
 
   const dispatch = useAppDispatch();
   const methods = useForm();
   const { register, handleSubmit, reset } = methods;
+
   const handleDisconnectInstance = async () => {
     if (instance) {
       const { instanceName } = instance;
       try {
-        const logoutResponse = await axios.delete(`https://api.parceriasdenegocios.com.br/instance/logout/${instanceName}`, config);
-
-        if (logoutResponse.status === 200) {
-          await axios.delete(`https://api.parceriasdenegocios.com.br/instance/delete/${instanceName}`, config);
+        await axios.delete(`https://api.parceriasdenegocios.com.br/instance/logout/${instanceName}`, config);
+        await axios.delete(`https://api.parceriasdenegocios.com.br/instance/delete/${instanceName}`, config).then(() => {
           localStorage.removeItem('instance');
           localStorage.removeItem('profile');
           dispatch(clearDataApp())
           setInstance(null);
           setProfile(null);
           setTimeLeft(40);
-
           handleCreateInstance();
-        } else {
-          console.error('Erro ao realizar o logout da instância:', logoutResponse.statusText);
-        }
-
+        })
       } catch (error) {
         console.error('Erro ao desconectar a instância:', error);
       }
@@ -325,6 +320,24 @@ export function InstanceDialog({
     }
 
   }
+
+  const handleGetConnectionState = async () => {
+    const { instanceName } = instance
+    try {
+      const { data: response } = await axios.get(`https://api.parceriasdenegocios.com.br/instance/connectionState/${instanceName}`, config)
+      setStatus(response?.instance?.state)
+      setQrcode('');
+    } catch (error) {
+      const { response } = error;
+      console.error(response.data);
+      console.error(response.status);
+      console.error(response.headers);
+    }
+  }
+
+  useEffect(() => {
+    handleGetConnectionState()
+  }, [qrcode, status])
 
   useEffect(() => {
     if (!instance) {
@@ -498,7 +511,7 @@ export function InstanceDialog({
                           overlap="circular"
                           anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                           variant="dot"
-                          statuscolor='rgb(76, 175, 80)'
+                          statuscolor={`${status !== 'close' ? 'rgb(76, 175, 80)' : 'rgb(208, 29, 29)'}`}
                         >
                           <Avatar
                             alt={profile.profileName}
@@ -537,6 +550,11 @@ export function InstanceDialog({
               onClick={handleManualUpdate}
             >
               Gerar novo QR Code
+            </Button>
+          }
+          {status === 'close' &&
+            <Button size="large" onClick={handleManualUpdate} variant="contained" color="success" startIcon={<Iconify icon="solar:refresh-bold-duotone" />}>
+              Reconectar Gerar novo QR Code
             </Button>
           }
         </DialogActions>

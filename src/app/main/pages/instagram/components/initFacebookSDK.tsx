@@ -8,7 +8,7 @@ export default function initFacebookSDK(): Promise<void> {
         appId: FACEBOOK_APP_ID,
         cookie: true,
         xfbml: true,
-        version: "v10.0",
+        version: "v20.0",
       });
 
       resolve();
