@@ -1,4 +1,5 @@
 import type { Theme, SxProps } from '@mui/material/styles';
+import { memo, useMemo } from 'react';
 
 import Box from '@mui/material/Box';
 import Portal from '@mui/material/Portal';
@@ -22,7 +23,7 @@ type Props = {
   sx?: SxProps<Theme>;
 };
 
-export function ContactsActionSelected({
+const ContactsActionSelected = memo(({
   all,
   action,
   selected,
@@ -31,7 +32,18 @@ export function ContactsActionSelected({
   onSelectAllItems,
   sx,
   ...other
-}: Props) {
+}: Props) => {
+
+  const potentialEarnings = useMemo(
+    () => FuseUtils.formatCurrency(numSelected * 20),
+    [numSelected]
+  );
+
+  const totalEarnings = useMemo(
+    () => FuseUtils.formatCurrency(all * 20),
+    [all]
+  );
+
   return (
     <Portal>
       <Box
@@ -53,8 +65,8 @@ export function ContactsActionSelected({
       >
         <Box sx={{ ml: .8, gap: 2, display: 'grid' }}>
           <Typography component="span" variant="h6" className="text-md leading-5" sx={{ textAlign: 'center', mb: 0, color: 'common.white', [stylesMode.dark]: { color: 'grey.800' } }}>
-            Você poderá ganhar: <br /> <Typography component="span" variant="h5" className="leading-7	font-500 text-4xl font-['Cera_Pro']">{FuseUtils.formatCurrency(numSelected * 20)}</Typography>
-            <br />{` de ${FuseUtils.formatCurrency(all * 20)}`}
+            Você poderá ganhar: <br /> <Typography component="span" variant="h5" className="leading-7	font-500 text-4xl font-['Cera_Pro']">{potentialEarnings}</Typography>
+            <br />{` de ${totalEarnings}`}
           </Typography>
         </Box>
         <Box sx={{ ml: .8, gap: 1, display: 'grid', alignItems: 'center', justifyContent: 'center' }}>
@@ -82,4 +94,6 @@ export function ContactsActionSelected({
       </Box>
     </Portal>
   );
-}
+});
+
+export default ContactsActionSelected;

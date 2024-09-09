@@ -72,9 +72,10 @@ function stringToColor(string: string) {
 }
 
 function stringAvatar(name: string) {
-  const nameParts = name.split(' ');
+  const nameParts = name?.split(' ');
+
   let initials;
-  if (nameParts.length === 1) {
+  if (nameParts?.length === 1) {
     initials = `${nameParts[0][0]}${nameParts[0][0]}`;
   } else {
     initials = `${nameParts[0][0]}${nameParts[1][0]}`;
@@ -517,7 +518,7 @@ export function InstanceDialog({
                             alt={profile.profileName}
                             src={profile.profilePictureUrl}
                             className="object-cover"
-                            {...stringAvatar(profile.profileName)}
+                            {...stringAvatar(profile?.profileName)}
                           />
                         </StyledBadge>
                         <ListItemText primary={profile.profileName} secondary={profile.owner.replace('@s.whatsapp.net', '')} />

@@ -9,7 +9,7 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import { Iconify } from '@fuse/components/iconify';
 import Button from '@mui/material/Button';
-import { ContactsActionSelected } from './components/ContactsActionSelected';
+import ContactsActionSelected from './components/ContactsActionSelected';
 import { useBoolean } from '@fuse/hooks/use-boolean';
 import { useTheme } from '@mui/material/styles';
 import { ShareDialog } from './components/ShareDialog';
