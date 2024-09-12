@@ -519,6 +519,10 @@ module.exports = {
         A200: '#18FFFF',
         A400: '#00E5FF',
         A700: '#00B8D4'
+      },
+      brand: {
+        light: '#fafff0',
+        strong: '#d9ff80'
       }
     }),
     columns: {

@@ -18,18 +18,16 @@ export default function InputDocument(props) {
       <InputMask
         {...field}
         {...rest}
-        mask={
-          meta.value.length <= 14 ? '999.999.999-999' : '99.999.999/9999-99'
-        }
+        mask={'999.999.999-999'}
         maskChar=""
-        type="tel"
+        type="text"
       >
         {inputProps => (
           <TextField
             variant="filled"
             {...inputProps}
             type="tel"
-            error={Boolean(meta.touched && meta.error)}
+            error={meta.touched && meta.error && true}
             helperText={_renderHelperText()}
           />
         )}

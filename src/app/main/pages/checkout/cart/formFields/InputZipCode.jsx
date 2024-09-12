@@ -231,8 +231,7 @@ export default function InputZipCode(props) {
               </p>
               <div className="p-1 mb-0 font-italic text-muted font-size-10">
                 <small>
-                  É um protocolo do sistema para garantir a sua segurança. Seus
-                  dados estão 100% seguros.
+                  É para garantir que sua box chegue no endereço correto.
                 </small>
               </div>
             </Grid>

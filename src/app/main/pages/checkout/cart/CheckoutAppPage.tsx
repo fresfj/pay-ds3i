@@ -332,7 +332,6 @@ function CheckoutPage() {
 	const location = useLocation()
 	const searchParams = new URLSearchParams(location.search)
 	const currentAmount = searchParams.get('amount') || '';
-
 	const [amount, setAmount] = useState(currentAmount)
 	const cookiesLabel = [
 		'_fbp',
@@ -369,6 +368,7 @@ function CheckoutPage() {
 	const currentUrl = window.location.href
 	const [createConversionTracking] = useCreateConversionTrackingMutation()
 
+	const period = searchParams.get('period') || '';
 	const customerId = searchParams.get('rid') || '';
 	const { data: referralCustomer } = useGetCustomersItemQuery(customerId, { skip: !customerId });
 
@@ -644,13 +644,15 @@ function CheckoutPage() {
 
 
 	const _renderStepContent = (step) => {
+		const subscriptionOption = subscription(product?.subscriptionOptions)
+
 		switch (step) {
 			case 0:
 				return <AddressForm formField={formField} />
 			case 1:
-				return <FreightForm formField={{ ...formField, cart }} />
+				return <FreightForm formField={{ ...formField, cart, subscriptionOption }} />
 			case 2:
-				return <PaymentForm formField={{ ...formField }} cookies={cookies} />
+				return <PaymentForm formField={{ ...formField, subscriptionOption }} cookies={cookies} />
 			default:
 				return <div className='flex flex-col justify-center items-center'>
 					<Alert severity="warning" className='my-32'>
@@ -913,6 +915,11 @@ function CheckoutPage() {
 
 	}, [setCustomerData, setCouponData, customer, total])
 
+	const subscription = (options) => {
+		if (!options || options.length === 0) return null;
+		const foundOption = options.find((option) => option.type.toLowerCase() === period.toLowerCase());
+		return foundOption || options[0];
+	}
 
 	useDeepCompareEffect(() => {
 		dispatch(clearCart())
@@ -921,7 +928,7 @@ function CheckoutPage() {
 			dispatch(addToCart({
 				...product,
 				quantity: 1,
-				value: Number(product?.priceTaxIncl)
+				value: Number(product?.isSubscription ? subscription(product?.subscriptionOptions)?.value : product?.priceTaxIncl)
 			}))
 		}
 
@@ -949,9 +956,10 @@ function CheckoutPage() {
 		const ferchInstallments = async () => {
 			const installments = []
 			const installmentValue = []
-			const installmentCount = cart.products[0]?.installments
-				? cart.products[0]?.installments
-				: 1
+			const installmentCount = cart.products[0]?.isSubscription
+				? subscription(cart.products[0]?.subscriptionOptions)?.installments :
+				cart.products[0]?.installments ? cart.products[0]?.installments : 1
+
 			for (let index = 1; index <= installmentCount; index++) {
 				let value = null
 				const fees = 0.0292 / (1 - 1 / Math.pow(1 + 0.0292, index))
@@ -959,10 +967,10 @@ function CheckoutPage() {
 				const addition = add - total
 				const totalFees = fees * total * index
 
-				if (index === 1) {
+				if (index >= 1 && index <= 3) {
 					value = {
 						value: index,
-						label: <><small className='installments text-base'>{index}x de</small> {formatCurrencyMap((total))}</>
+						label: <><small className='installments text-base'>{index}x de</small> {formatCurrencyMap((total / index))}</>
 					}
 				} else {
 					value = {
@@ -978,6 +986,7 @@ function CheckoutPage() {
 					value: index !== 1 ? (fees * total).toFixed(2) : total.toFixed(2)
 				})
 			}
+
 			setValueInstallments(installments)
 
 		}
@@ -994,10 +1003,6 @@ function CheckoutPage() {
 
 	const handleClickListItem = () => {
 		setOpen(true);
-	}
-
-	const getTotalPrice = () => {
-		return cart.products.reduce((subTotal, item) => subTotal + item.quantity * item.value, 0)
 	}
 
 	const handleClose = (newValue?: string) => {
@@ -1170,7 +1175,9 @@ function CheckoutPage() {
 																				loading ? <Skeleton className="total" animation="wave" width="60%" /> :
 																					<span className="total proportional-nums">
 																						{values?.paymentMethod === 'card' && valueInstallments.length > 1 ?
-																							values.installments ? valueInstallments[values.installments - 1].label : valueInstallments[valueInstallments.length - 1].label
+																							values.installments
+																								? valueInstallments[values.installments - 1].label
+																								: valueInstallments[(cart.products[0]?.isSubscription ? subscription(cart.products[0]?.subscriptionOptions)?.installments : valueInstallments.length) - 1].label
 																							: formatCurrencyMap(total)
 																						}
 																					</span>
@@ -1341,67 +1348,77 @@ function CheckoutPage() {
 														</motion.div>
 													}
 													{cart?.products.length > 0 ? (
-														cart.products.map((item, k) => (
-															<div key={k}>
-																{k > 0 ? <Divider /> : ''}
-																<div className="content-card">
-																	<div className="imagem-produto">
-																		{(item?.images?.length > 0 || item?.image) && !loading ? (
+														cart.products.map((item, k) => {
+															const subscriptionOption = subscription(item.subscriptionOptions);
+															return (
+																<div key={k}>
+																	{k > 0 ? <Divider /> : ''}
+																	<div className="content-card">
+																		<div className="imagem-produto">
+																			{(item?.images?.length > 0 || item?.image) && !loading ? (
 
-																			item.featuredImageId ? (
-																				<Image
-																					className="w-full block rounded product-img"
-																					sx={{ width: 120, height: 120 }}
-																					src={_.find(item.images, { id: item.featuredImageId })?.url}
-																					alt={item.name}
-																					visibleByDefault
-																					ratio={{ xs: '1/1', sm: '1/1' }}
+																				item.featuredImageId ? (
+																					<Image
+																						className="w-full block rounded product-img"
+																						sx={{ width: 120, height: 120 }}
+																						src={_.find(item.images, { id: item.featuredImageId })?.url}
+																						alt={item.name}
+																						visibleByDefault
+																						ratio={{ xs: '1/1', sm: '1/1' }}
 
-																				/>
-																			) : (
-																				<Image
-																					className="w-full block rounded product-img"
-																					sx={{ width: 120, height: 120 }}
-																					src={`${item?.image ? item?.image : 'assets/images/apps/ecommerce/on-payment.png'}`}
-																					alt={item.name}
-																					visibleByDefault
-																					ratio={{ xs: '1/1', sm: '1/1' }}
-																				/>
-																			)
-
-																		) : (
-																			<Skeleton
-																				sx={{ borderRadius: 2 }}
-																				animation="wave"
-																				variant="rounded"
-																				width={120}
-																				height={120}
-																			/>
-																		)}
-																	</div>
-																	<div className="info-card">
-																		<div className="product-name">
-																			<Typography variant="h6">
-																				{loading ? (
-																					<Skeleton animation="wave" width="100%" />)
-																					:
-																					item.name
-																				}
-																			</Typography>
-																		</div>
-																		<div className="product-price">
-																			<small className="d-block small-text">
-																				{loading ? (
-																					<Skeleton animation="wave" width="100%" />
+																					/>
 																				) : (
-																					`${FuseUtils.formatCurrency(item.value)} ${item.subscription ? item.cycle : 'à vista'}`
-																				)}
-																			</small>
+																					<Image
+																						className="w-full block rounded product-img"
+																						sx={{ width: 120, height: 120 }}
+																						src={`${item?.image ? item?.image : 'assets/images/apps/ecommerce/on-payment.png'}`}
+																						alt={item.name}
+																						visibleByDefault
+																						ratio={{ xs: '1/1', sm: '1/1' }}
+																					/>
+																				)
+
+																			) : (
+																				<Skeleton
+																					sx={{ borderRadius: 2 }}
+																					animation="wave"
+																					variant="rounded"
+																					width={120}
+																					height={120}
+																				/>
+																			)}
+																		</div>
+																		<div className="info-card">
+																			<div className="product-name">
+																				<Typography variant="h6">
+																					{loading ? (
+																						<Skeleton animation="wave" width="100%" />)
+																						:
+																						item.name
+																					}
+																				</Typography>
+																			</div>
+																			<div className="product-price">
+																				<small className="d-block small-text">
+																					{loading ? (
+																						<Skeleton animation="wave" width="100%" />
+																					) : (
+																						<>
+																							{
+																								item?.isSubscription ?
+																									`${subscriptionOption?.installments}x de ${FuseUtils.formatCurrency((subscriptionOption?.value / subscriptionOption?.installments))} - ${subscriptionOption?.type}`
+																									:
+																									`${FuseUtils.formatCurrency(item.value)} ${item.subscription ? item.cycle : 'à vista'}`
+																							}
+																						</>
+																					)}
+																				</small>
+																			</div>
 																		</div>
 																	</div>
 																</div>
-															</div>
-														))
+															)
+														})
 													) : (
 														<div className="content-card" key={1}>
 															<div className="imagem-produto">
@@ -1472,7 +1489,7 @@ function CheckoutPage() {
 																			:
 																			<Chip
 																				color='success'
-																				label={`${values.coupon.toUpperCase()} (${discountApplied} OFF)`}
+																				label={`${values?.coupon ? values?.coupon.toUpperCase() : 'INDICAÇÃO'} (${discountApplied} OFF)`}
 																				onDelete={removePromoCode}
 																			/>
 																		}
@@ -1506,7 +1523,10 @@ function CheckoutPage() {
 																loading ? <Skeleton className="total" animation="wave" width="60%" /> :
 																	<span className="total proportional-nums">
 																		{values?.paymentMethod === 'card' && valueInstallments.length > 1 ?
-																			values.installments ? valueInstallments[values.installments - 1].label : valueInstallments[valueInstallments.length - 1].label
+																			values.installments
+																				? valueInstallments[values.installments - 1].label
+																				: valueInstallments[(cart.products[0]?.isSubscription ?
+																					subscription(cart.products[0]?.subscriptionOptions)?.installments : valueInstallments.length) - 1].label
 																			: formatCurrencyMap(total)
 																		}
 																	</span>

@@ -75,10 +75,15 @@ function stringAvatar(name: string) {
   const nameParts = name?.split(' ');
 
   let initials;
-  if (nameParts?.length === 1) {
+  if (nameParts?.length !== undefined && nameParts?.length === 1) {
     initials = `${nameParts[0][0]}${nameParts[0][0]}`;
   } else {
-    initials = `${nameParts[0][0]}${nameParts[1][0]}`;
+    if (nameParts?.length !== undefined) {
+      initials = `WB`;
+    } else {
+      initials = `${nameParts[0][0]}${nameParts[1][0]}`;
+    }
+
   }
 
   return {
@@ -174,10 +179,9 @@ export function InstanceDialog({
 
   const handleDisconnectInstance = async () => {
     if (instance) {
-      const { instanceName } = instance;
       try {
-        await axios.delete(`https://api.parceriasdenegocios.com.br/instance/logout/${instanceName}`, config);
-        await axios.delete(`https://api.parceriasdenegocios.com.br/instance/delete/${instanceName}`, config).then(() => {
+        await axios.delete(`https://api.parceriasdenegocios.com.br/instance/logout/${instance?.instanceName}`, config);
+        await axios.delete(`https://api.parceriasdenegocios.com.br/instance/delete/${instance?.instanceName}`, config).then(() => {
           localStorage.removeItem('instance');
           localStorage.removeItem('profile');
           dispatch(clearDataApp())
@@ -196,10 +200,9 @@ export function InstanceDialog({
 
   const handleGetSettings = async () => {
     if (!instance && !profile) return;
-    const { instanceName } = instance;
     try {
       const { data: response } = await axios.get(
-        `https://api.parceriasdenegocios.com.br/instance/fetchInstances?instanceName=${instanceName}`,
+        `https://api.parceriasdenegocios.com.br/instance/fetchInstances?instanceName=${instance?.instanceName}`,
         config
       );
 
@@ -219,9 +222,8 @@ export function InstanceDialog({
 
 
   const handleGetContacts = async () => {
-    const { instanceName } = instance
     try {
-      const { data: response } = await axios.post(`https://api.parceriasdenegocios.com.br/chat/findContacts/${instanceName}`,
+      const { data: response } = await axios.post(`https://api.parceriasdenegocios.com.br/chat/findContacts/${instance?.instanceName}`,
         {},
         config
       );
@@ -230,7 +232,6 @@ export function InstanceDialog({
         .then((res) => {
           setInstanceContacts(response)
           dispatch(setContactsApp(response))
-          console.log(`createNewInstance`, res)
         }).catch((error) => {
           console.error('Erro ao criar nova instância:', error);
         })
@@ -241,10 +242,9 @@ export function InstanceDialog({
   }
 
   const handleGetQrcode = async () => {
-    const { instanceName } = instance
     try {
       const { data: response } = await axios.get(
-        `https://api.parceriasdenegocios.com.br/instance/connect/${instanceName}`,
+        `https://api.parceriasdenegocios.com.br/instance/connect/${instance?.instanceName}`,
         config
       );
 
@@ -323,11 +323,13 @@ export function InstanceDialog({
   }
 
   const handleGetConnectionState = async () => {
-    const { instanceName } = instance
     try {
-      const { data: response } = await axios.get(`https://api.parceriasdenegocios.com.br/instance/connectionState/${instanceName}`, config)
+      const { data: response } = await axios.get(`https://api.parceriasdenegocios.com.br/instance/connectionState/${instance?.instanceName}`, config)
       setStatus(response?.instance?.state)
       setQrcode('');
+      if (response?.instance?.state === "connecting") {
+        handleGetQrcode();
+      }
     } catch (error) {
       const { response } = error;
       console.error(response.data);
@@ -337,8 +339,10 @@ export function InstanceDialog({
   }
 
   useEffect(() => {
-    handleGetConnectionState()
-  }, [qrcode, status])
+    if (instance && !profile) {
+      handleGetConnectionState()
+    }
+  }, [status])
 
   useEffect(() => {
     if (!instance) {

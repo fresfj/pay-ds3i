@@ -13,7 +13,6 @@ const ProductModel = (data: PartialDeep<EcommerceProduct>) =>
     description: '',
     categories: [],
     tags: [],
-    payments: [],
     colors: [],
     gender: [],
     sizes: [],
@@ -44,7 +43,13 @@ const ProductModel = (data: PartialDeep<EcommerceProduct>) =>
     image: '',
     total: '',
     createdAt: new Date(),
-    updatedAt: new Date()
+    updatedAt: new Date(),
+    isSubscription: false,
+    paymentMethods: ['pix', 'card'],
+    subscriptionOptions: [],
+    linkedProducts: [],
+    upSellProducts: [],
+    orderBumpProducts: []
   })
 
 export default ProductModel

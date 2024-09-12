@@ -19,8 +19,8 @@ const {
     installments,
     nameOnCard,
     cardNumber,
-    cardDocument,
     expiryDate,
+    cardDocument,
     cvv,
     shipping,
     paymentMethod
@@ -46,8 +46,8 @@ export default data => {
     [installments.name]: '',
     [nameOnCard.name]: '',
     [cardNumber.name]: '',
-    [cardDocument.name]: '',
     [expiryDate.name]: '',
+    [cardDocument.name]: '',
     [cvv.name]: '',
     [shipping.name]: '',
     [paymentMethod.name]: 'card'

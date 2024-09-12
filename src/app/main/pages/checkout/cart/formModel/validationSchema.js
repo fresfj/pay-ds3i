@@ -6,7 +6,6 @@ import {
   validateCPF,
   validatePhone,
   validateEmail,
-  validateCNPJ,
   validateCep
 } from 'validations-br'
 
@@ -23,12 +22,12 @@ const {
     neighborhood,
     city,
     zipcode,
+    cardDocument,
     country,
     shipping,
     installments,
     nameOnCard,
     cardNumber,
-    cardDocument,
     expiryDate,
     cvv
   }

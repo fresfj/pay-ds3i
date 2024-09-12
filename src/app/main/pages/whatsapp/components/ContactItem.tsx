@@ -94,7 +94,6 @@ export function ContactItem({
     </AvatarGroup>
   );
 
-  console.log(checkbox.value)
   return (
     <>
       <Paper

@@ -89,8 +89,8 @@ export default {
     },
     nameOnCard: {
       name: 'nameOnCard',
-      label: 'Nome titular do cartão*',
-      requiredErrorMsg: 'Nome titular do cartão é obrigatório'
+      label: 'Titular do cartão*',
+      requiredErrorMsg: 'Titular do cartão é obrigatório'
     },
     installments: {
       name: 'installments',
@@ -103,18 +103,18 @@ export default {
       requiredErrorMsg: 'Número do cartão é obrigatório',
       invalidErrorMsg: 'Card number is not valid (e.g. 4111111111111)'
     },
+    expiryDate: {
+      name: 'expiryDate',
+      label: 'Validade*',
+      requiredErrorMsg: 'Validade é obrigatório',
+      invalidErrorMsg: 'Expiry date is not valid'
+    },
     cardDocument: {
       name: 'cardDocument',
       label: 'CPF/CNPJ titular do cartão*',
       requiredErrorMsg: 'CPF/CNPJ titular do cartão é obrigatório',
       validatedErrorMsg: 'O CPF/CNPJ digitado é inválido',
       invalidErrorMsg: 'CPF/CNPJ is not valid (e.g. 41111111111)'
-    },
-    expiryDate: {
-      name: 'expiryDate',
-      label: 'Validade*',
-      requiredErrorMsg: 'Validade é obrigatório',
-      invalidErrorMsg: 'Expiry date is not valid'
     },
     cvv: {
       name: 'cvv',

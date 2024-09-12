@@ -19,7 +19,7 @@ function ReferralHeader() {
 							className="text-20 md:text-32 font-extrabold tracking-tight leading-none"
 							role="button"
 						>
-							indique e ganhe
+							Indique e ganhe
 						</Typography>
 
 					</div>

@@ -17,6 +17,7 @@ const options = { headers: { 'Content-Type': 'application/json' } }
 export interface OrderDataProps {
   customerId?: string
   abandonedId?: string
+  cardDocument?: string
   address: string
   addressNumber: string
   state: string
@@ -100,42 +101,52 @@ export const sendOrderToAsaas = createAsyncThunk(
     let payRef = null
     let dataCard = null
 
-    if (data.cart.paymentMethod === 'card') {
-      const [expiryMonth, expiryYear] = data.cart?.cardExpiry.split('/')
+    const { cart, customer } = data
+    const {
+      paymentMethod,
+      installments,
+      installmentValue,
+      total,
+      discount,
+      products
+    } = cart
+
+    if (paymentMethod === 'card') {
+      const [expiryMonth, expiryYear] = cart?.cardExpiry.split('/')
       dataCard = {
         creditCard: {
-          holderName: data.cart?.cardName,
-          number: data.cart?.cardNumber,
+          holderName: cart?.cardName,
+          number: cart?.cardNumber,
           expiryMonth,
           expiryYear: `20${expiryYear}`,
-          ccv: data.cart?.cardCCV
+          ccv: cart?.cardCCV
         },
         creditCardHolderInfo: {
-          name: data.customer.name,
-          email: data.customer.email,
-          cpfCnpj: data.customer.cpfCnpj,
-          postalCode: data.customer.postalCode,
-          addressNumber: data.customer.addressNumber,
-          phone: data.customer.phone
+          name: customer.name,
+          email: customer.email,
+          cpfCnpj: customer.cpfCnpj,
+          postalCode: customer.postalCode,
+          addressNumber: customer.addressNumber,
+          phone: customer.phone
         }
       }
     }
 
     const dataPayments = {
-      customer: data.customer.id,
+      customer: customer.id,
       billingType:
-        data.cart.paymentMethod.toUpperCase() === 'CARD'
+        paymentMethod.toUpperCase() === 'CARD'
           ? 'CREDIT_CARD'
-          : data.cart.paymentMethod.toUpperCase(),
+          : paymentMethod.toUpperCase(),
       dueDate: date,
-      description: data.cart.products[0].name,
+      description: cart.products[0].name,
       cycle: 'MONTHLY',
-      nextDueDate: data.cart.discount.value > 0 ? nextMonth : thisMonth,
+      nextDueDate: cart.discount.value > 0 ? nextMonth : thisMonth,
       maxPayments: 12,
-      externalReference: data.cart.products[0].id,
+      externalReference: cart.products[0].id,
       postalService: false,
       ...dataCard,
-      value: data.cart?.total,
+      value: cart?.total,
       remoteIp: '8.8.8.8'
     }
 
@@ -159,17 +170,8 @@ export const sendOrderToAsaas = createAsyncThunk(
           payment: paymentErr,
           updatedAt: timestamp
         })
-    }
 
-    const cart = {
-      products: data.cart.products.map((produto: any) => ({
-        sku: produto.sku,
-        name: produto.name,
-        value: produto.value
-      })),
-      shipping: data.cart.shipping,
-      discount: data.cart.discount,
-      total: data.cart.total
+      return paymentErr
     }
 
     const processPayment = async (
@@ -182,11 +184,10 @@ export const sendOrderToAsaas = createAsyncThunk(
           return await axios.post(`${API_BACKEND}subscriptions`, {
             ...dataPayments,
             value: (
-              parseFloat(data.cart?.subTotal) +
-              parseFloat(data.cart?.shipping.value)
+              parseFloat(cart?.subTotal) + parseFloat(cart?.shipping.value)
             ).toFixed(2),
-            customerInformation: data.customer,
-            cart
+            customerInformation: customer,
+            cart: cart
           })
         }
         return response
@@ -197,50 +198,39 @@ export const sendOrderToAsaas = createAsyncThunk(
     }
 
     try {
-      if (!data.cart.products[0].recurrent) {
+      const commonPaymentData = {
+        ...dataPayments,
+        customerInformation: customer,
+        cart
+      }
+
+      if (!products[0]?.recurrent) {
+        const installmentCount =
+          paymentMethod.toUpperCase() === 'CARD' && installments > 1
+            ? installments
+            : 0
+        const installmentValueProcessed =
+          paymentMethod.toUpperCase() === 'CARD' ? installmentValue : total
+
         const newDataPay = {
-          ...dataPayments,
+          ...commonPaymentData,
           authorizeOnly: true,
-          totalValue: data.cart?.total,
-          installmentCount:
-            data.cart.paymentMethod.toUpperCase() === 'CARD'
-              ? data.cart?.installments > 1
-                ? data.cart?.installments
-                : 0
-              : 0,
-          installmentValue:
-            data.cart.paymentMethod.toUpperCase() === 'CARD'
-              ? data.cart?.installmentValue
-              : data.cart?.total,
-          customerInformation: data.customer,
-          cart
+          totalValue: total,
+          installmentCount,
+          installmentValue: installmentValueProcessed,
+          value: total
         }
+
         payment = await processPayment(newDataPay, false)
-      } else if (data.cart.discount.value !== 0) {
-        payment = await processPayment(
-          {
-            ...dataPayments,
-            customerInformation: data.customer,
-            cart
-          },
-          true
-        )
       } else {
-        payment = await processPayment(
-          {
-            ...dataPayments,
-            customerInformation: data.customer,
-            cart
-          },
-          true
-        )
+        payment = await processPayment(commonPaymentData, true)
       }
 
       const state: any = {
         id,
-        customer: data.customer,
+        customer: customer,
         payment: payment.data,
-        cart: data.cart
+        cart: cart
       }
 
       await firestore
@@ -251,29 +241,29 @@ export const sendOrderToAsaas = createAsyncThunk(
       const cards = {
         id: FuseUtils.generateGUID(),
         paymentDefault: true,
-        billingType: data.cart.paymentMethod.toUpperCase(),
+        billingType: paymentMethod.toUpperCase(),
         creditCard: {
-          holderName: data.cart?.cardName,
-          number: data.cart?.cardNumber,
-          expiry: data.cart?.cardExpiry,
-          ccv: data.cart?.cardCCV
+          holderName: cart?.cardName,
+          number: cart?.cardNumber,
+          expiry: cart?.cardExpiry,
+          ccv: cart?.cardCCV
         },
         creditCardHolderInfo: {
-          name: data.customer.name,
-          email: data.customer.email,
-          cpfCnpj: data.customer.cpfCnpj,
-          postalCode: data.customer.postalCode,
-          addressNumber: data.customer.addressNumber,
-          phone: data.customer.phone
+          name: customer.name,
+          email: customer.email,
+          cpfCnpj: customer.cpfCnpj,
+          postalCode: customer.postalCode,
+          addressNumber: customer.addressNumber,
+          phone: customer.phone
         }
       }
 
       await firestore
         .collection('customers')
-        .doc(data.customer.customerId)
+        .doc(customer.customerId)
         .update({
           updatedAt: timestamp,
-          customerId: data.customer.id,
+          customerId: customer.id,
           received: [payment.data],
           paymentMethods: firebase.firestore.FieldValue.arrayUnion(cards),
           orders: firebase.firestore.FieldValue.arrayUnion(id)
@@ -283,7 +273,7 @@ export const sendOrderToAsaas = createAsyncThunk(
 
       return state
     } catch (error) {
-      throw error
+      console.error('Error processing payment:', error)
     }
   }
 )
@@ -406,6 +396,7 @@ export const createOrder = createAsyncThunk(
       cardName: orderData?.nameOnCard,
       cardNumber: orderData?.cardNumber,
       cardExpiry: orderData?.expiryDate,
+      cardDocument: orderData?.cardDocument,
       cardCCV: orderData?.cvv,
       observations: 'SISTEMA CHECKOUT DE PAGAMENTO',
       ...installment

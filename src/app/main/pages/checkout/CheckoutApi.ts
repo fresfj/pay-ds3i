@@ -230,7 +230,11 @@ export type EcommerceProductImageType = {
   url: string
   type: string
 }
-
+export type EcommerceSubscriptionOptionsType = {
+  value: number
+  installments: string
+  type: string
+}
 export type EcommerceProduct = {
   id: string
   name: string
@@ -252,6 +256,8 @@ export type EcommerceProduct = {
   weight: string
   extraShippingFee: number
   active: boolean
+  isSubscription: boolean
+  subscriptionOptions: EcommerceSubscriptionOptionsType[]
 }
 
 export const {

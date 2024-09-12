@@ -196,12 +196,13 @@ export default function PaymentForm(props) {
     formField: {
       installments,
       nameOnCard,
-      cardDocument,
       cardNumber,
       expiryDate,
+      cardDocument,
       cvv,
       paymentMethod
     },
+    formField: { subscriptionOption },
     cookies
   } = props
 
@@ -213,8 +214,7 @@ export default function PaymentForm(props) {
   const [toggle, setToggle] = useState({})
   const [loading, setLoading] = useState(true)
   const [payments, setPayments] = useState([
-    { value: 'card', label: 'Cartão de Crédito', svg: 'credit-card' },
-    { value: 'pix', label: 'PIX', svg: 'pix' }
+    { value: 'card', label: 'Cartão de Crédito', svg: 'credit-card' }
   ])
   const [valueInstallments, setValueInstallments] = useState([])
   const total = useSelector(calculateTotalSelector)
@@ -242,19 +242,21 @@ export default function PaymentForm(props) {
   const ferchInstallments = () => {
     const installments = []
     const installmentValue = []
-    const installmentCount = products[0]?.installments
-      ? products[0]?.installments
-      : 1
+    const installmentCount = cart.products[0]?.isSubscription
+      ? subscriptionOption?.installments
+      : cart.products[0]?.installments
+        ? cart.products[0]?.installments
+        : 1
     for (let index = 1; index <= installmentCount; index++) {
       let value = null
       const fees = 0.0292 / (1 - 1 / Math.pow(1 + 0.0292, index))
       const add = fees * total * index
       const addition = add - total
       const totalFees = fees * total * index
-      if (index === 1) {
+      if (index >= 1 && index <= 3) {
         value = {
           value: index,
-          label: `${index}x de ${FuseUtils.formatCurrency(total)} s/juros`
+          label: `${index}x de ${FuseUtils.formatCurrency(total / index)} s/juros`
         }
       } else {
         value = {
@@ -396,13 +398,16 @@ export default function PaymentForm(props) {
         items
       }
 
-      // if (products[0]?.payments !== undefined) {
-      //   const paymentsSelected = products[0]?.payments.map(pay => {
-      //     const info = toggleButtons.find(button => button.value === pay)
-      //     return { value: info.value, label: info.label, svg: info.svg }
-      //   })
-      //   setPayments(paymentsSelected)
-      // }
+      if (
+        products[0]?.paymentMethods !== undefined &&
+        products[0]?.paymentMethods.length > 0
+      ) {
+        const paymentsSelected = products[0]?.paymentMethods.map(pay => {
+          const info = toggleButtons.find(button => button.value === pay)
+          return { value: info.value, label: info.label, svg: info.svg }
+        })
+        setPayments(paymentsSelected)
+      }
     }
 
     if (!cart?.customer) {
@@ -433,7 +438,6 @@ export default function PaymentForm(props) {
       }
     })()
   }, [total])
-
   return (
     <Root>
       <StyledToggleButtonGroup

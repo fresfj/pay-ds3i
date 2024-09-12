@@ -13,7 +13,8 @@ import { useFormikContext } from 'formik'
 export default function FreightForm(props) {
   const {
     formField: { shipping },
-    formField: { cart }
+    formField: { cart },
+    formField: { subscriptionOption }
   } = props
 
   const [map, setMap] = useState('shipping')
@@ -151,6 +152,32 @@ export default function FreightForm(props) {
                 </Typography>
               </AccordionDetails>
             </Accordion>
+
+            {cart?.products[0]?.isSubscription &&
+              subscriptionOption?.remittance && (
+                <>
+                  {loading ? (
+                    <Skeleton
+                      sx={{ height: 60, transform: 'none' }}
+                      animation="wave"
+                    />
+                  ) : (
+                    <Typography
+                      sx={{
+                        backgroundColor: '#7505FB',
+                        color: '#ede1fa',
+                        borderRadius: 2,
+                        px: { md: 2, xs: 1 },
+                        py: { md: 3, xs: 2 }
+                      }}
+                    >
+                      <strong>Recebimento:</strong> A cada{' '}
+                      {subscriptionOption.remittance} dias (garantindo que você
+                      nunca fique sem creatina ou com excesso)
+                    </Typography>
+                  )}
+                </>
+              )}
           </div>
         </Grid>
         <Grid item xs={12} mt={2}>

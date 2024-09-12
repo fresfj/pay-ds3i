@@ -158,6 +158,9 @@ function Product() {
 								className="h-64"
 								label="Shipping"
 							/>
+							{/* {form?.isSubscription && (
+								<Tab className="h-64" label="Subscription Options" />
+							)} */}
 						</Tabs>
 						<div className="p-16 sm:p-24 max-w-3xl">
 							<div className={tabValue !== 0 ? 'hidden' : ''}>
@@ -182,6 +185,8 @@ function Product() {
 							<div className={tabValue !== 5 ? 'hidden' : ''}>
 								<ShippingTab />
 							</div>
+
+
 						</div>
 					</>
 				}
