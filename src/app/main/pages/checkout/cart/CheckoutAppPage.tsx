@@ -50,7 +50,8 @@ import { Image } from '@fuse/components/image'
 import { Iconify } from '@fuse/components/iconify';
 import { labelColorDefs, labelColors } from 'src/app/main/apps/shop/components/labelColors';
 import ReferralLabels from '@fuse/components/label/referralLabels';
-const steps = ['Informações', 'Entrega', 'Pagamento']
+
+
 const { formId, formField } = checkoutFormModel
 
 interface QontoStepIconRootProps {
@@ -313,6 +314,14 @@ const _renderTextoProcess = (params, process) => {
 	)
 }
 
+const determineSteps = (products) => {
+	if (products[0]?.type === 'digital') {
+		return ['Informações', 'Pagamento'];
+	}
+	return ['Informações', 'Entrega', 'Pagamento'];
+};
+
+
 /**
  * The checkout.
  */
@@ -333,6 +342,8 @@ function CheckoutPage() {
 	const searchParams = new URLSearchParams(location.search)
 	const currentAmount = searchParams.get('amount') || '';
 	const [amount, setAmount] = useState(currentAmount)
+	const [steps, setSteps] = useState(determineSteps(cart?.products));
+
 	const cookiesLabel = [
 		'_fbp',
 		'_fbc',
@@ -367,9 +378,9 @@ function CheckoutPage() {
 	const [isReturningUser, setIsReturningUser] = useState(false);
 	const currentUrl = window.location.href
 	const [createConversionTracking] = useCreateConversionTrackingMutation()
-
 	const period = searchParams.get('period') || '';
 	const customerId = searchParams.get('rid') || '';
+
 	const { data: referralCustomer } = useGetCustomersItemQuery(customerId, { skip: !customerId });
 
 	useEffect(() => {
@@ -646,12 +657,12 @@ function CheckoutPage() {
 	const _renderStepContent = (step) => {
 		const subscriptionOption = subscription(product?.subscriptionOptions)
 
-		switch (step) {
-			case 0:
+		switch (steps[step]) {
+			case 'Informações':
 				return <AddressForm formField={formField} />
-			case 1:
+			case 'Entrega':
 				return <FreightForm formField={{ ...formField, cart, subscriptionOption }} />
-			case 2:
+			case 'Pagamento':
 				return <PaymentForm formField={{ ...formField, subscriptionOption }} cookies={cookies} />
 			default:
 				return <div className='flex flex-col justify-center items-center'>
@@ -996,6 +1007,7 @@ function CheckoutPage() {
 		}
 
 		ferchInstallments()
+		setSteps(determineSteps(cart.products));
 	}, [cart.products, setValueInstallments, total]);
 
 
@@ -1022,17 +1034,17 @@ function CheckoutPage() {
 		<Root className="flex flex-col flex-auto min-w-0 pb-0 sm:pb-96">
 			<ThemeProvider theme={mainThemeDark}>
 				<Box
-					className="relative pb-112 px-16 sm:pb-208 sm:px-64 overflow-hidden bg-auto bg-top"
+					className="relative pb-112 px-16 sm:pb-208 sm:px-64 overflow-hidden bg-auto bg-no-repeat bg-top"
 					sx={{
-						backgroundImage: "url('assets/images/etc/BG-CREABOX_01.webp')",
+						backgroundImage: "url('assets/images/etc/banner-ick.png')",
 						backgroundColor: '#710ffa',
 						color: theme =>
 							theme.palette.getContrastText(theme.palette.primary.main)
 					}}
 				>
 					<div className={clsx('FusePageCarded-header', 'container flex flex-col justify-center')}>
-						<div className="mt-20 mr-10 pt-16 sm:pt-32">
-							<img className="object-contain h-48 w-full translate-x-6 scale-125 z-50" src='assets/images/logo/logo-box-white.png' />
+						<div className="mt-20 mr-10 pt-16 sm:pt-32 h-144">
+							<img className="hidden object-contain h-48 w-full translate-x-6 scale-125 z-50" src='assets/images/logo/logo-box-white.png' />
 						</div>
 					</div>
 					<svg
@@ -1060,7 +1072,8 @@ function CheckoutPage() {
 					<Formik
 						innerRef={formikRef}
 						initialValues={formInitialValues(cookies)}
-						validationSchema={validate ? currentValidationSchema : false}
+
+						validationSchema={!validate || (steps.length === activeStep + 1) ? false : currentValidationSchema}
 						onSubmit={_handleSubmit}
 					>
 						{({ isSubmitting, errors, values, setFieldValue }) => (

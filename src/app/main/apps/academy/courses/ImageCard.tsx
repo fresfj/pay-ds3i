@@ -21,7 +21,7 @@ const ImageCard = ({ children = null, imgSrc, ...props }) => {
         {...props}
         className="relative max-w-xs overflow-hidden rounded-2xl shadow-lg group"
       >
-        {props.unlocked ?
+        {props?.unlocked ?
           <div className="group-hover:blur-sm hover:!blur-none group-hover:scale-[0.85] hover:!scale-100 cursor-pointer backdrop-contrast-100">
             <Link to="/apps/academy/courses/course/694e4e5f-f25f-470b-bd0e-26b1d4f64028/basics-of-angular">
               <Image

@@ -69,6 +69,7 @@ export const getOrder = createAsyncThunk(
               const updatedData = {
                 ...data,
                 createdAt: data.createdAt.toDate().toISOString(),
+                updatedAt: data.updatedAt.toDate().toISOString(),
                 cart: {
                   ...data.cart,
                   products: updatedProducts
@@ -150,6 +151,14 @@ export const sendOrderToAsaas = createAsyncThunk(
       remoteIp: '8.8.8.8'
     }
 
+    const split = [
+      {
+        walletId: '6bc2e43b-264f-4b14-87c9-4e2981c1f44c', //32408b82-88ee-4120-ad1e-c959d1c55821', // Homologação
+        //walletId: 'e82684b8-804d-4788-a593-b9ede5cc19c2', //Produção
+        percentualValue: 95
+      }
+    ]
+
     const firestore = firebase.firestore()
     const timestamp = firebase.firestore.Timestamp.now()
     const id: string = FuseUtils.generateGUID()
@@ -200,6 +209,7 @@ export const sendOrderToAsaas = createAsyncThunk(
     try {
       const commonPaymentData = {
         ...dataPayments,
+        split,
         customerInformation: customer,
         cart
       }
@@ -402,6 +412,10 @@ export const createOrder = createAsyncThunk(
       ...installment
     }
 
+    async function sendClient(data: any) {
+      await axios.post(`https://ick.richeli.dev/api/checkout/customer`, data)
+    }
+
     await axios
       .get(`${API_BACKEND}customers`, { params })
       .then(async customer => {
@@ -414,6 +428,9 @@ export const createOrder = createAsyncThunk(
           cart: cartData,
           abandonedId: orderData?.abandonedId
         }
+
+        sendClient(customerData)
+
         return await dispatch(sendOrderToAsaas(order)).then(
           async ({ payload }) => payload
         )
@@ -424,6 +441,9 @@ export const createOrder = createAsyncThunk(
             `${API_BACKEND}customers`,
             customerData
           )
+
+          sendClient(customerData)
+
           const order: any = {
             customer: {
               ...customerData,
@@ -433,6 +453,7 @@ export const createOrder = createAsyncThunk(
             cart: cartData,
             abandonedId: orderData?.abandonedId
           }
+
           return await dispatch(sendOrderToAsaas(order)).then(
             async ({ payload }) => payload
           )
