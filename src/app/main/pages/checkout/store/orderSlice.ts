@@ -429,7 +429,7 @@ export const createOrder = createAsyncThunk(
           abandonedId: orderData?.abandonedId
         }
 
-        sendClient(customer)
+        sendClient(customer.data)
 
         return await dispatch(sendOrderToAsaas(order)).then(
           async ({ payload }) => payload
@@ -442,7 +442,7 @@ export const createOrder = createAsyncThunk(
             customerData
           )
 
-          sendClient(customer)
+          sendClient(customer.data)
 
           const order: any = {
             customer: {
