@@ -224,7 +224,7 @@ export const sendOrderToAsaas = createAsyncThunk(
 
         const newDataPay = {
           ...commonPaymentData,
-          authorizeOnly: true,
+          authorizeOnly: false,
           totalValue: total,
           installmentCount,
           installmentValue: installmentValueProcessed,
@@ -429,7 +429,7 @@ export const createOrder = createAsyncThunk(
           abandonedId: orderData?.abandonedId
         }
 
-        sendClient(customerData)
+        sendClient(customer)
 
         return await dispatch(sendOrderToAsaas(order)).then(
           async ({ payload }) => payload
@@ -442,7 +442,7 @@ export const createOrder = createAsyncThunk(
             customerData
           )
 
-          sendClient(customerData)
+          sendClient(customer)
 
           const order: any = {
             customer: {
