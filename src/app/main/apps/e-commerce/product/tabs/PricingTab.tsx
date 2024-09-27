@@ -11,12 +11,15 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import Typography from '@mui/material/Typography';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import MenuItem from '@mui/material/MenuItem';
+import Stack from '@mui/material/Stack';
+import { Iconify } from '@fuse/components/iconify';
+import Paper from '@mui/material/Paper';
+import ButtonBase from '@mui/material/ButtonBase';
 
 
 type SubscriptionOption = {
-	type: 'Trimestral' | 'Semestral' | 'Anual';
+	type: 'Mensal' | 'Trimestral' | 'Semestral' | 'Anual';
 	installments: number;
-	remittance: number;
 };
 
 interface EcommerceProduct {
@@ -31,7 +34,7 @@ function PricingTab() {
 
 	const { control, watch, setValue } = methods;
 	const isSubscription = watch('isSubscription');
-	const paymentOptions = ['pix', 'card'];
+	const paymentOptions = ['card', 'pix'];
 
 	const { fields, append, remove } = useFieldArray({
 		control,
@@ -39,7 +42,7 @@ function PricingTab() {
 	});
 
 	const addSubscriptionOption = () => {
-		append({ type: 'Trimestral', value: 0, installments: 1, remittance: 1 });
+		append({ type: 'Trimestral', value: 0, installments: 1 });
 	};
 
 	if (fields.length === 0) {
@@ -48,19 +51,48 @@ function PricingTab() {
 
 	return (
 		<div>
-			<Controller
-				name="isSubscription"
-				control={control}
-				render={({ field }) => (
-					<FormControlLabel
-						className="mt-8 mb-16"
-						control={<Switch {...field} checked={field.value} />}
-						color='inherit'
-						label="Produto com Assinatura"
-					/>
-				)}
-			/>
+			<Stack spacing={2} mb={2}>
+				<Typography variant="subtitle2">Tipo do Produto</Typography>
 
+				<Controller
+					name="type"
+					control={control}
+					render={({ field }) => (
+						<Box gap={2} display="grid" gridTemplateColumns="repeat(2, 1fr)">
+							{[
+								{
+									label: 'Físico',
+									icon: <Iconify icon="solar:box-line-duotone" width={32} sx={{ mb: 2 }} />,
+								},
+								{
+									label: 'Digital',
+									icon: <Iconify icon="solar:code-square-line-duotone" width={32} sx={{ mb: 2 }} />,
+								},
+							].map((item) => (
+								<Paper
+									component={ButtonBase}
+									variant="outlined"
+									key={item.label}
+									onClick={() => field.onChange(item.label.toLowerCase())}
+									sx={{
+										p: 2.5,
+										borderRadius: 1,
+										typography: 'subtitle2',
+										flexDirection: 'column',
+										...(item.label.toLowerCase() === field.value.toLowerCase() && {
+											borderWidth: 2,
+											borderColor: 'text.primary',
+										}),
+									}}
+								>
+									{item.icon}
+									{item.label}
+								</Paper>
+							))}
+						</Box>
+					)}
+				/>
+			</Stack>
 			<Controller
 				name="priceTaxExcl"
 				control={control}
@@ -184,8 +216,21 @@ function PricingTab() {
 				)}
 			/>
 
+			<Controller
+				name="isSubscription"
+				control={control}
+				render={({ field }) => (
+					<FormControlLabel
+						className="mt-8 mb-16"
+						control={<Switch {...field} checked={field.value} />}
+						color='inherit'
+						label="Produto com Assinatura"
+					/>
+				)}
+			/>
+
 			{isSubscription && (
-				<Box mt={4}>
+				<Box mt={2}>
 					<Typography my={4} component='h5' variant='h6' color='text.primary'>
 						Opções de Assinatura
 					</Typography>
@@ -206,6 +251,7 @@ function PricingTab() {
 										variant="outlined"
 										fullWidth
 									>
+										<MenuItem value="Mensal">Mensal</MenuItem>
 										<MenuItem value="Trimestral">Trimestral</MenuItem>
 										<MenuItem value="Semestral">Semestral</MenuItem>
 										<MenuItem value="Anual">Anual</MenuItem>
@@ -246,21 +292,6 @@ function PricingTab() {
 								)}
 							/>
 
-							<Controller
-								name={`subscriptionOptions.${index}.remittance`}
-								control={control}
-								render={({ field }) => (
-									<TextField
-										{...field}
-										className="mt-8 mb-16 mx-4"
-										label="Remessa"
-										variant="outlined"
-										type="number"
-										style={{ width: '180px' }}
-										fullWidth
-									/>
-								)}
-							/>
 
 							{index > 0 && (
 								<IconButton color="error" onClick={() => remove(index)} disabled={fields.length <= 1}>

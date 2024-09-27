@@ -6,12 +6,18 @@ import { Controller, useFormContext } from 'react-hook-form';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import Box from '@mui/material/Box';
 import { EcommerceProduct } from '../../ECommerceApi';
+import IconButton from '@mui/material/IconButton';
+import { Iconify } from '@fuse/components/iconify';
+import { varAlpha } from 'src/theme/styles/utils';
+import firebase from 'firebase/compat/app'
+import { useDispatch } from 'react-redux';
+import Tooltip from '@mui/material/Tooltip';
 
 const Root = styled('div')(({ theme }) => ({
 	'& .productImageFeaturedStar': {
 		position: 'absolute',
 		top: 0,
-		right: 0,
+		left: 0,
 		color: orange[400],
 		opacity: 0
 	},
@@ -49,9 +55,28 @@ const Root = styled('div')(({ theme }) => ({
  */
 function ProductImagesTab() {
 	const methods = useFormContext();
-	const { control, watch } = methods;
-
+	const { control, watch, setValue } = methods;
+	const dispatch = useDispatch()
 	const images = watch('images') as EcommerceProduct['images'];
+
+
+	const handleDeleteImage = async (media) => {
+		const storageRef = firebase.storage().ref()
+		const imagesRef = storageRef.child(`images/${media.id}.jpg`)
+
+		try {
+			imagesRef.delete().then(() => {
+				const updatedImages = images.filter(image => image.id !== media.id);
+				setValue('images', updatedImages);
+			}).catch((error) => {
+				console.log(`Uh-oh, an error occurred!`, error)
+			});
+
+		} catch (error) {
+			console.log(`catch`, error)
+		}
+
+	};
 
 	return (
 		<Root>
@@ -123,25 +148,58 @@ function ProductImagesTab() {
 						return (
 							<>
 								{images.map((media) => (
-									<div
-										onClick={() => onChange(media.id)}
-										onKeyDown={() => onChange(media.id)}
-										role="button"
-										tabIndex={0}
-										className={clsx(
-											'productImageItem flex items-center justify-center relative w-128 h-128 rounded-16 mx-12 mb-24 overflow-hidden cursor-pointer outline-none shadow hover:shadow-lg',
-											media.id === value && 'featured'
-										)}
-										key={media.id}
-									>
-										<FuseSvgIcon className="productImageFeaturedStar">
-											heroicons-solid:star
-										</FuseSvgIcon>
-										<img
-											className="max-w-none w-auto h-full"
-											src={media.url}
-											alt="product"
-										/>
+									<div className='flex items-center justify-center relative rounded-16 mx-12 mb-24 overflow-hidden'>
+										<div
+											key={media.id}
+											tabIndex={0}
+											className={clsx(
+												'productImageItem w-128 h-128 cursor-pointer outline-none shadow hover:shadow-lg',
+												media.id === value && 'featured'
+											)}
+											onClick={() => onChange(media.id)}
+											onKeyDown={() => onChange(media.id)}
+										>
+											<IconButton
+												size="small"
+												className="productImageFeaturedStar"
+												sx={{
+													p: 0.35,
+													position: 'absolute'
+												}}
+											>
+												<FuseSvgIcon>
+													heroicons-solid:star
+												</FuseSvgIcon>
+											</IconButton>
+
+											<img
+												className="max-w-none w-auto h-full"
+												src={media.url}
+												alt="product"
+											/>
+										</div>
+										<Tooltip
+											arrow
+											title={`Delete`}
+											slotProps={{ popper: { modifiers: [{ name: 'offset', options: { offset: [0, -12] } }] } }}
+										>
+											<IconButton
+												size="small"
+												onClick={() => handleDeleteImage(media)}
+												onKeyDown={() => handleDeleteImage(media)}
+												sx={{
+													p: 0.35,
+													top: 4,
+													right: 4,
+													position: 'absolute',
+													color: 'common.white',
+													bgcolor: (theme) => varAlpha(theme.palette.grey['900Channel'], 0.48),
+													'&:hover': { bgcolor: (theme) => varAlpha(theme.palette.grey['900Channel'], 0.72) },
+												}}
+											>
+												<Iconify icon="mingcute:close-line" width={16} />
+											</IconButton>
+										</Tooltip>
 									</div>
 								))}
 							</>

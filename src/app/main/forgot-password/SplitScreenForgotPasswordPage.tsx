@@ -15,6 +15,8 @@ import { useAppDispatch } from 'app/store/store';
 import { showMessage } from '@fuse/core/FuseMessage/store/fuseMessageSlice';
 import firebase from 'firebase/compat/app';
 import CardContent from '@mui/material/CardContent';
+import { useState } from 'react';
+import CircularProgress from '@mui/material/CircularProgress';
 /**
  * Form Validation Schema
  */
@@ -35,6 +37,7 @@ const defaultValues = {
 function SplitScreenForgotPasswordPage() {
 	const { firebaseService } = useAuth();
 	const dispatch = useAppDispatch();
+	const [loading, setLoading] = useState(false);
 	const { control, formState, handleSubmit, reset, setError } = useForm({
 		mode: 'onChange',
 		defaultValues,
@@ -44,6 +47,7 @@ function SplitScreenForgotPasswordPage() {
 	const { isValid, dirtyFields, errors } = formState;
 
 	function onSubmit(formData: FormType) {
+		setLoading(true);
 		const { email } = formData;
 		firebaseService?.forgotPassword(email).then(() => {
 
@@ -85,6 +89,9 @@ function SplitScreenForgotPasswordPage() {
 						message: err.message
 					});
 				});
+			})
+			.finally(() => {
+				setLoading(false)
 			})
 		reset(defaultValues);
 	}
@@ -135,11 +142,12 @@ function SplitScreenForgotPasswordPage() {
 							color="secondary"
 							className=" mt-4 w-full"
 							aria-label="Register"
-							disabled={_.isEmpty(dirtyFields) || !isValid}
+							disabled={_.isEmpty(dirtyFields) || !isValid || loading}
+							startIcon={loading && <CircularProgress size={20} />}
 							type="submit"
 							size="large"
 						>
-							Enviar redefinição
+							{loading ? 'Enviando redefinição...' : 'Enviar redefinição'}
 						</Button>
 
 						<Typography
@@ -151,7 +159,7 @@ function SplitScreenForgotPasswordPage() {
 								className="ml-4"
 								to="/sign-in"
 							>
-								Acesso ao Club
+								Acesso
 							</Link>
 						</Typography>
 					</form>
@@ -161,8 +169,7 @@ function SplitScreenForgotPasswordPage() {
 			<Box
 				className="relative hidden h-full flex-auto items-center justify-center bg-cover bg-no-repeat bg-center overflow-hidden p-64 md:flex lg:px-112"
 				sx={{
-					backgroundColor: 'primary.main',
-					backgroundImage: "url('assets/images/etc/BG-CREABOX_04-1024x972.webp')"
+					backgroundColor: 'primary.main'
 				}}
 			>
 				<svg
@@ -229,10 +236,10 @@ function SplitScreenForgotPasswordPage() {
 
 				<div className="relative z-10 w-full max-w-2xl">
 					<div className="text-7xl font-bold leading-none text-gray-100">
-						<div>Pronto pra transformar sua rotina?</div>
+						<div>Produtos e atendimento integrados em um único sistema</div>
 					</div>
 					<div className="mt-24 text-xl leading-6 tracking-tight text-gray-400">
-						A Creabox Club comemora cada passo rumo à sua melhor versão juntos, numa vibe única de motivação e troca de ideias com a galera! Facilitamos a sua vida com acesso fácil a tudo que é fitness, direto pela net.
+						Uma solução completa para otimizar o controle de estoque, melhorar o atendimento ao cliente e impulsionar o crescimento do seu negócio, tudo em um só lugar.
 					</div>
 					<div className="mt-32 flex items-center">
 						<AvatarGroup

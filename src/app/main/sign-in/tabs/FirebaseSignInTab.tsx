@@ -16,6 +16,7 @@ import firebase from 'firebase/compat/app';
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import { Iconify } from '@fuse/components/iconify';
+import CircularProgress from '@mui/material/CircularProgress';
 
 /**
  * Form Validation Schema
@@ -44,6 +45,7 @@ function FirebaseSignInTab() {
 	const { firebaseService } = useAuth();
 	const dispatch = useAppDispatch();
 	const [showPassword, setShowPassword] = useState(false)
+	const [loading, setLoading] = useState(false);
 	const { control, formState, handleSubmit, setValue, setError } = useForm<FormType>({
 		mode: 'onChange',
 		defaultValues,
@@ -52,10 +54,15 @@ function FirebaseSignInTab() {
 
 	const { isValid, dirtyFields, errors } = formState;
 
-	function onSubmit(formData: FormType) {
-		const { email, password } = formData;
+	async function onSubmit(formData: FormType) {
 
-		firebaseService?.signIn(email, password).catch((_error) => {
+		setLoading(true);
+
+
+		try {
+			const { email, password } = formData;
+			await firebaseService?.signIn(email, password);
+		} catch (_error) {
 			const error = _error as firebase.auth.Error;
 
 			const errors: {
@@ -96,7 +103,9 @@ function FirebaseSignInTab() {
 					message: err.message
 				});
 			});
-		});
+		} finally {
+			setLoading(false);
+		}
 	}
 
 	return (
@@ -186,11 +195,12 @@ function FirebaseSignInTab() {
 					color="secondary"
 					className=" mt-16 w-full"
 					aria-label="Sign in"
-					disabled={_.isEmpty(dirtyFields) || !isValid}
+					disabled={_.isEmpty(dirtyFields) || !isValid || loading}
 					type="submit"
 					size="large"
+					startIcon={loading && <CircularProgress size={20} />}
 				>
-					Entrar no Club
+					{loading ? 'Entrando...' : 'Entrar'}
 				</Button>
 			</form>
 		</div>

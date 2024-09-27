@@ -14,6 +14,8 @@ import InputMask from 'react-input-mask'
 import { useAppDispatch } from 'app/store/store';
 import { addCustomer } from '../../pages/checkout/store/cartSlice';
 import { Customer, useCreateCustomersItemMutation } from '../../apps/customers/CustomersApi';
+import CircularProgress from '@mui/material/CircularProgress';
+import { useState } from 'react';
 
 /**
  * Form Validation Schema
@@ -53,6 +55,7 @@ type SignUpPayload = z.infer<typeof schema>;
 function FirebaseSignUpTab() {
 	const { firebaseService } = useAuth();
 	const dispatch = useAppDispatch()
+	const [loading, setLoading] = useState(false);
 	const [createCustomer] = useCreateCustomersItemMutation()
 	const { control, formState, handleSubmit, setError } = useForm({
 		mode: 'onChange',
@@ -63,15 +66,14 @@ function FirebaseSignUpTab() {
 	const { isValid, dirtyFields, errors } = formState;
 
 	const onSubmit = async (formData: SignUpPayload) => {
-		const { displayName, email, password, phone } = formData;
+		setLoading(true);
 
+		const { displayName, email, password, phone } = formData;
 
 		const result = schema.safeParse(formData);
 		if (!result.success) {
-
 			return;
 		}
-
 
 		firebaseService?.signUp(email, password, displayName).then(async ({ user }) => {
 
@@ -150,7 +152,9 @@ function FirebaseSignUpTab() {
 						message: err.message
 					});
 				});
-			});
+			}).finally(() => {
+				setLoading(false)
+			})
 	}
 
 	return (
@@ -284,11 +288,13 @@ function FirebaseSignUpTab() {
 				color="secondary"
 				className="mt-24 w-full"
 				aria-label="Register"
-				disabled={_.isEmpty(dirtyFields) || !isValid}
+				disabled={_.isEmpty(dirtyFields) || !isValid || loading}
+				startIcon={loading && <CircularProgress size={20} />}
 				type="submit"
 				size="large"
 			>
-				Crie sua conta gratuita
+
+				{loading ? 'Criando a sua conta...' : 'Crie sua conta'}
 			</Button>
 		</form>
 	);

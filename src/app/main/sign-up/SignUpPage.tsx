@@ -89,8 +89,7 @@ function SignUpPage() {
 			<Box
 				className="relative hidden h-full flex-auto items-center justify-center bg-cover bg-no-repeat bg-center overflow-hidden p-64 md:flex lg:px-112"
 				sx={{
-					backgroundColor: 'primary.main',
-					backgroundImage: "url('assets/images/etc/BG-CREABOX_04-1024x972.webp')"
+					backgroundColor: 'primary.main'
 				}}
 			>
 				<svg
@@ -157,10 +156,10 @@ function SignUpPage() {
 
 				<div className="relative z-10 w-full max-w-2xl">
 					<div className="text-7xl font-bold leading-none text-gray-100">
-						<div>Pronto pra transformar sua rotina?</div>
+						<div>Produtos e atendimento integrados em um único sistema</div>
 					</div>
 					<div className="mt-24 text-xl leading-6 tracking-tight text-gray-400">
-						A Creabox Club comemora cada passo rumo à sua melhor versão juntos, numa vibe única de motivação e troca de ideias com a galera! Facilitamos a sua vida com acesso fácil a tudo que é fitness, direto pela net.
+						Uma solução completa para otimizar o controle de estoque, melhorar o atendimento ao cliente e impulsionar o crescimento do seu negócio, tudo em um só lugar.
 					</div>
 					<div className="mt-32 flex items-center">
 						<AvatarGroup
