@@ -20,12 +20,14 @@ import ScrumboardAppConfig from './scrumboard/ScrumboardAppConfig'
 import TasksAppConfig from './tasks/TasksAppConfig'
 import NotificationsAppConfig from './notifications/NotificationsAppConfig'
 import ShopAppConfig from './shop/ShopAppConfig'
+import TriggerConfig from './trigger/TriggerConfig'
 
 /**
  * The list of application configurations.
  */
 const appsConfigs: FuseRouteConfigsType = [
   AcademyAppConfig,
+  TriggerConfig,
   CalendarAppConfig,
   MessengerAppConfig,
   ContactsAppConfig,

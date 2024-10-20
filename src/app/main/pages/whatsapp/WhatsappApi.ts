@@ -284,6 +284,35 @@ export const selectFilteredContactList = (customers: Customer[]) =>
 
     return FuseUtils.filterArrayByString<Customer>(customers, searchText)
   })
+/**
+ * Select filtered customers
+ */
+
+export const selectFilteredGroupList = (groups: Customer[]) =>
+  createSelector([selectSearchText], searchText => {
+    if (!groups) {
+      return []
+    }
+
+    let filteredGroups = groups.filter((group: any) => group.size > 4)
+
+    if (searchText?.length > 0) {
+      filteredGroups = FuseUtils.filterArrayByString<Customer>(
+        filteredGroups,
+        searchText
+      )
+    }
+
+    filteredGroups = filteredGroups.sort((a: any, b: any) => b.size - a.size)
+
+    if (searchText?.length === 0) {
+      return filteredGroups
+    }
+
+    return filteredGroups.sort(
+      (a: any, b: any) => b.subjectTime - a.subjectTime
+    )
+  })
 
 /**
  * Select grouped customers
@@ -295,21 +324,21 @@ export const selectGroupedFilteredContacts = (customers: Customer[]) =>
     }
 
     const sortedCustomers = [...customers]?.sort((a, b) =>
-      a?.pushName?.localeCompare(b.pushName, 'es', { sensitivity: 'base' })
+      a?.pushName?.localeCompare(b?.pushName, 'es', { sensitivity: 'base' })
     )
 
     const groupedObject: {
       [key: string]: GroupedCustomers
     } = sortedCustomers?.reduce<AccumulatorType>((r, e) => {
       // get first letter of name of current element
-      const group = e.pushName[0]
+      // const group = e?.pushName[0]
 
-      // if there is no property in accumulator with this letter create it
-      if (!r[group]) r[group] = { group, children: [e] }
-      // if there is push current element to children array for that letter
-      else {
-        r[group]?.children?.push(e)
-      }
+      // // if there is no property in accumulator with this letter create it
+      // if (!r[group]) r[group] = { group, children: [e] }
+      // // if there is push current element to children array for that letter
+      // else {
+      //   r[group]?.children?.push(e)
+      // }
 
       // return accumulator
       return r

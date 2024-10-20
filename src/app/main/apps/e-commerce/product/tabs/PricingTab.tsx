@@ -42,7 +42,7 @@ function PricingTab() {
 	});
 
 	const addSubscriptionOption = () => {
-		append({ type: 'Trimestral', value: 0, installments: 1 });
+		append({ type: 'Mensal', value: 0, installments: 1 });
 	};
 
 	if (fields.length === 0) {
@@ -73,13 +73,13 @@ function PricingTab() {
 									component={ButtonBase}
 									variant="outlined"
 									key={item.label}
-									onClick={() => field.onChange(item.label.toLowerCase())}
+									onClick={() => field.onChange(item?.label?.toLowerCase())}
 									sx={{
 										p: 2.5,
 										borderRadius: 1,
 										typography: 'subtitle2',
 										flexDirection: 'column',
-										...(item.label.toLowerCase() === field.value.toLowerCase() && {
+										...(item?.label?.toLowerCase() === field?.value?.toLowerCase() && {
 											borderWidth: 2,
 											borderColor: 'text.primary',
 										}),

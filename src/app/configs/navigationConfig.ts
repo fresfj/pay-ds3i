@@ -254,10 +254,24 @@ const navigationConfig: FuseNavItemType[] = [
             end: true
           },
           {
-            id: 'whatsapp',
-            title: 'Whatsapp',
+            id: 'leads',
+            title: 'Leads',
             type: 'item',
-            url: 'apps/settings/whatsapp',
+            url: 'apps/settings/contacts',
+            end: true
+          },
+          {
+            id: 'trigger',
+            title: 'Disparo',
+            type: 'item',
+            url: 'apps/settings/trigger',
+            end: true
+          },
+          {
+            id: 'instances',
+            title: 'Instâncias',
+            type: 'item',
+            url: 'apps/settings/instances',
             end: true
           }
         ]

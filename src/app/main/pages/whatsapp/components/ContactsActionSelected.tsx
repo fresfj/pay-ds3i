@@ -15,6 +15,7 @@ import FuseUtils from '@fuse/utils';
 
 type Props = {
   all: number;
+  groups?: boolean;
   rowCount: number;
   numSelected: number;
   selected?: string[];
@@ -25,6 +26,7 @@ type Props = {
 
 const ContactsActionSelected = memo(({
   all,
+  groups = false,
   action,
   selected,
   rowCount,
@@ -85,7 +87,7 @@ const ContactsActionSelected = memo(({
                 variant="subtitle2"
                 sx={{ mr: 2, color: 'common.white', [stylesMode.dark]: { color: 'grey.800' } }}
               >
-                {selected.length} Contatos selecionados
+                {`${selected.length} ${groups ? `Grupos` : `Contatos`} selecionados`}
               </Typography>
             )}
           </Box>

@@ -217,6 +217,15 @@ export function InstanceDialog({
 
     } catch (error) {
       console.error('Error getting settings:', error.response);
+      if (error.response?.status === 404) {
+        localStorage.removeItem('instance');
+        localStorage.removeItem('profile');
+        dispatch(clearDataApp())
+        setInstance(null);
+        setProfile(null);
+        setTimeLeft(40);
+        handleCreateInstance();
+      }
     }
   };
 

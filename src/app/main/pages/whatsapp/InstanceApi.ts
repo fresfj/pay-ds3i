@@ -213,7 +213,9 @@ const InstanceApi = api
         invalidatesTags: ['instance_board_cards']
       }),
       getInstances: build.query<GetInstancesApiResponse, GetInstancesApiArg>({
-        query: () => ({ url: `/mock-api/instance/boards` }),
+        query: queryArg => ({
+          url: `/mock-api/instance/${queryArg}/${queryArg}`
+        }),
         providesTags: ['instance_boards']
       }),
       createInstance: build.mutation<
@@ -221,15 +223,24 @@ const InstanceApi = api
         CreateInstanceApiArg
       >({
         query: board => ({
-          url: `/mock-api/instance/boards`,
+          url: `/mock-api/instance/create`,
           method: 'POST',
           data: board
         }),
         invalidatesTags: ['instance_boards', 'instance_board']
       }),
+      getInstanceReferral: build.query<
+        GetInstanceApiResponse,
+        GetInstanceApiArg
+      >({
+        query: queryArg => ({
+          url: `/mock-api/instance/referral/${queryArg.instanceId}`
+        }),
+        providesTags: ['instance_board']
+      }),
       getInstance: build.query<GetInstanceApiResponse, GetInstanceApiArg>({
-        query: boardId => ({
-          url: `/mock-api/instance/boards/${boardId}`
+        query: queryArg => ({
+          url: `/mock-api/instance/instances/${queryArg.instanceId}`
         }),
         providesTags: ['instance_board']
       }),
@@ -248,8 +259,8 @@ const InstanceApi = api
         DeleteInstanceApiResponse,
         DeleteInstanceApiArg
       >({
-        query: boardId => ({
-          url: `/mock-api/instance/boards/${boardId}`,
+        query: board => ({
+          url: `/mock-api/instance/${board.name}`,
           method: 'DELETE'
         }),
         invalidatesTags: ['instance_boards']
@@ -357,19 +368,18 @@ export type DeleteInstanceCardApiArg = {
 }
 
 export type GetInstancesApiResponse = /** status 200 OK */ Instance[]
-export type GetInstancesApiArg = void
+export type GetInstancesApiArg = any
 
-export type CreateInstanceApiResponse = unknown
-export type CreateInstanceApiArg = PartialDeep<Instance>
+export type CreateInstanceApiResponse = any[]
+export type CreateInstanceApiArg = any
 
 export type GetInstanceApiResponse = /** status 200 OK */ Instance
-export type GetInstanceApiArg = string /** board id */
-
-export type UpdateInstanceApiResponse = unknown
-export type UpdateInstanceApiArg = PartialDeep<Instance>
+export type GetInstanceApiArg = { instanceId: string }
+export type UpdateInstanceApiResponse = any[]
+export type UpdateInstanceApiArg = any
 
 export type DeleteInstanceApiResponse = unknown
-export type DeleteInstanceApiArg = string /** board id */
+export type DeleteInstanceApiArg = any /** board id */
 
 export type UpdateInstanceListOrderApiResponse = unknown
 export type UpdateInstanceListOrderApiArg = {
@@ -501,6 +511,7 @@ export const {
   useGetInstancesQuery,
   useCreateInstanceMutation,
   useGetInstanceQuery,
+  useGetInstanceReferralQuery,
   useUpdateInstanceMutation,
   useDeleteInstanceMutation
 } = InstanceApi

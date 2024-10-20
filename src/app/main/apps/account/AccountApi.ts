@@ -16,7 +16,8 @@ export const addTagTypes = [
   'profile_about',
   'account_orders',
   'account_order',
-  'account_referral'
+  'account_referral',
+  'account_history'
 ] as const
 
 const AccountApi = api
@@ -34,6 +35,24 @@ const AccountApi = api
           params: { account }
         }),
         providesTags: ['account_referral']
+      }),
+      getAccountHistory: build.query<
+        GetAccountHistoryApiResponse,
+        GetAccountHistoryApiArg
+      >({
+        query: userId => ({ url: `/mock-api/account/history/${userId}` }),
+        providesTags: ['account_history']
+      }),
+      createAccountsReferralItem: build.mutation<
+        CreateAccountsReferralItemApiResponse,
+        CreateAccountsReferralItemApiArg
+      >({
+        query: queryArg => ({
+          url: `/mock-api/account/referral/transfer`,
+          method: 'POST',
+          data: queryArg
+        }),
+        invalidatesTags: ['account_referral']
       }),
       getAccountsOrders: build.query<
         GetAccountsOrdersApiResponse,
@@ -194,6 +213,10 @@ export type DeleteAccountsAddressApiArg = {
   addressId: string
 }
 
+export type CreateAccountsReferralItemApiResponse =
+  /** status 201 Created */ any
+export type CreateAccountsReferralItemApiArg = any
+
 export type DeleteAccountsPaymentApiResponse =
   /** status 200 Customer Deleted */ Account
 export type DeleteAccountsPaymentApiArg = {
@@ -232,6 +255,9 @@ export type UpdateAccountPlanApiArg = Account
 
 export type GetAccountsOrdersApiResponse = /** status 200 OK */ EcommerceOrder[]
 export type GetAccountsOrdersApiArg = any
+
+export type GetAccountHistoryApiResponse = any[]
+export type GetAccountHistoryApiArg = string
 
 export type GetAccountsOrderApiResponse = /** status 200 OK */ EcommerceOrder
 export type GetAccountsOrderApiArg = string // Order id
@@ -383,7 +409,9 @@ export type AccountAbout = {
 }
 
 export const {
+  useCreateAccountsReferralItemMutation,
   useGetAccountsReferralQuery,
+  useGetAccountHistoryQuery,
   useGetAccountsOrdersQuery,
   useGetAccountsOrderQuery,
   useDeleteAccountsAddressMutation,

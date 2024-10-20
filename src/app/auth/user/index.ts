@@ -2,7 +2,11 @@ import { FuseSettingsConfigType } from '@fuse/core/FuseSettings/FuseSettings'
 
 export type CustomerType = {
   displayName: string
+  name: string
+  photoURL?: string
+  email?: string
   id?: string
+  balance?: number
   referral?: {
     pix: {
       pixAddressKeyType: boolean

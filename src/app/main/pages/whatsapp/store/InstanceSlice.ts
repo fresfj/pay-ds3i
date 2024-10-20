@@ -24,9 +24,22 @@ const saveDataToStorage = state => {
   }
 }
 
+const removeDataFromStorage = (key: string) => {
+  try {
+    const storedData = getStoredData()
+    if (storedData && storedData[key]) {
+      delete storedData[key]
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(storedData))
+    }
+  } catch (error) {
+    console.error('Error removing data from storage:', error)
+  }
+}
+
 const initialState = getStoredData() || {
   instance: {},
   profile: {},
+  groups: [],
   contacts: []
 }
 
@@ -42,7 +55,15 @@ const instanceSlice = createSlice({
       state.profile = action.payload
       saveDataToStorage(state)
     },
+    setGroupsApp: (state, action) => {
+      state.groups = []
+      removeDataFromStorage('groups')
+      state.groups = action.payload
+      saveDataToStorage(state)
+    },
     setContactsApp: (state, action) => {
+      state.contacts = []
+      removeDataFromStorage('contacts')
       state.contacts = action.payload
       saveDataToStorage(state)
     },
@@ -59,6 +80,7 @@ const instanceSlice = createSlice({
     clearDataApp: state => {
       state.instance = {}
       state.profile = {}
+      state.groups = []
       state.contacts = []
       saveDataToStorage(state)
     }
@@ -70,6 +92,7 @@ export default instanceSlice.reducer
 export const {
   setInstanceApp,
   setProfileApp,
+  setGroupsApp,
   setContactsApp,
   addContactApp,
   removeContactApp,
@@ -78,6 +101,8 @@ export const {
 
 export const instanceSelector = state => state.whatsApp.instance?.instance
 export const profileSelector = state => state.whatsApp.instance?.profile
+export const groupsSelector = (state: AppRootStateType) =>
+  state?.whatsApp?.instance?.groups ?? []
 export const contactsSelector = (state: AppRootStateType) =>
   state?.whatsApp?.instance?.contacts ?? []
 

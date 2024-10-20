@@ -12,12 +12,15 @@ import checkoutPagesConfig from './checkout/CheckoutAppConfig'
 import productPagesConfig from './product/productPagesConfig'
 import whatsappConfig from './whatsapp/whatsappConfig'
 import instagramAppConfig from './instagram/instagramAppConfig'
+import instancesPagesConfig from './Instances/instancesConfig'
+
 /**
  * The pages routes config.
  */
 const pagesConfigs: FuseRouteConfigsType = [
   ...authenticationPagesConfig,
   checkoutPagesConfig,
+  instancesPagesConfig,
   instagramAppConfig,
   plansPagesConfig,
   whatsappConfig,

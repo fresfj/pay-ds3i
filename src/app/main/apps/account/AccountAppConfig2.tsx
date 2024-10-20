@@ -6,6 +6,8 @@ import pt from './i18n/pt';
 import en from './i18n/en';
 import tr from './i18n/tr';
 import AccountApp from './AccountApp';
+import WhatsappApp from '../../pages/whatsapp/WhatsappApp';
+import WhatsGroupApp from '../../pages/whatsapp/WhatsGroupApp';
 
 const Order = lazy(() => import('./order/Order'));
 const Orders = lazy(() => import('./orders/Orders'));
@@ -49,6 +51,14 @@ const AccountAppConfig = {
 				{
 					path: 'referral',
 					element: <Referral />
+				},
+				{
+					path: 'referral/whatsapp',
+					element: <WhatsappApp />
+				},
+				{
+					path: 'referral/whatsapp/groups',
+					element: <WhatsGroupApp />
 				}
 			]
 		}

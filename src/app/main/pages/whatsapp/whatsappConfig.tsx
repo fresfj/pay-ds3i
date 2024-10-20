@@ -2,6 +2,7 @@ import { Navigate } from 'react-router-dom';
 
 import { FuseRouteConfigType } from '@fuse/utils/FuseUtils';
 import WhatsappApp from './WhatsappApp';
+import WhatsGroupApp from './WhatsGroupApp';
 
 /**
  * The whatsapp pages config.
@@ -19,6 +20,10 @@ const whatsappPagesConfig: FuseRouteConfigType = {
 				{
 					path: '',
 					element: <WhatsappApp />
+				},
+				{
+					path: 'groups',
+					element: <WhatsGroupApp />
 				}
 			]
 		}
