@@ -8,13 +8,15 @@ import { varAlpha } from 'src/theme/styles';
 import { Iconify } from '../../iconify';
 
 import type { SingleFilePreviewProps } from '../types';
+import { FileThumbnail } from '../../file-thumbnail';
 
 // ----------------------------------------------------------------------
 
 export function SingleFilePreview({ file }: SingleFilePreviewProps) {
   const fileName = typeof file === 'string' ? file : file.name;
-
   const previewUrl = typeof file === 'string' ? file : URL.createObjectURL(file);
+  const isAudio = typeof file !== 'string' && file.type.startsWith('audio');
+  const isImage = typeof file !== 'string' && file.type.startsWith('image');
 
   return (
     <Box
@@ -25,19 +27,48 @@ export function SingleFilePreview({ file }: SingleFilePreviewProps) {
         width: 1,
         height: 1,
         position: 'absolute',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
       }}
     >
-      <Box
-        component="img"
-        alt={fileName}
-        src={previewUrl}
-        sx={{
-          width: 1,
-          height: 1,
-          borderRadius: 1,
-          objectFit: 'cover',
-        }}
-      />
+      {isAudio ? (
+        <Box
+          component="audio"
+          controls
+          src={previewUrl}
+          sx={{
+            width: '100%',
+            maxWidth: '300px',
+            outline: 'none',
+            borderRadius: 1,
+            boxShadow: (theme) => theme.shadows[3],
+          }}
+        />
+      ) : isImage ? (
+        <Box
+          component="img"
+          alt={fileName}
+          src={previewUrl}
+          sx={{
+            width: 1,
+            height: 1,
+            borderRadius: 1,
+            objectFit: 'cover',
+          }}
+        />
+      ) : (
+        <FileThumbnail
+          tooltip
+          imageView
+          file={file}
+          sx={{
+            width: 120,
+            height: 120
+          }}
+          slotProps={{ icon: { width: 96, height: 96 } }}
+        />
+      )}
     </Box>
   );
 }
@@ -49,7 +80,7 @@ export function DeleteButton({ sx, ...other }: IconButtonProps) {
     <IconButton
       size="small"
       sx={{
-        top: 16,
+        top: 36,
         right: 16,
         zIndex: 9,
         position: 'absolute',

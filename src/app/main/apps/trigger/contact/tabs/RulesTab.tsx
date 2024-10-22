@@ -52,7 +52,13 @@ function RulesTab() {
 	};
 
 	const handleImport = async () => {
-		const unifiedArray = removeDuplicates([...contacts, ...previewData]);
+		let unifiedArray = ''
+		if (contacts) {
+			unifiedArray = removeDuplicates([...contacts, ...previewData]);
+		} else {
+			unifiedArray = removeDuplicates([...previewData]);
+		}
+
 		setValue(`contacts`, unifiedArray, { shouldValidate: true, shouldDirty: true })
 		const result = await trigger();
 		if (result) {

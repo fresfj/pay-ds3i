@@ -7,11 +7,14 @@ import { useSelector } from 'react-redux';
 import { selectSelectedLabels, toggleSelectedLabels } from './store/selectedLabelsSlice';
 import { useGetCalendarLabelsQuery } from './CalendarApi';
 import LabelsDialog from './dialogs/labels/LabelsDialog';
+import { Iconify } from '@fuse/components/iconify';
 
 /**
  * The calendar app sidebar.
  */
-function CalendarAppSidebar() {
+function CalendarAppSidebar({
+	handleGoogleLogin, isSignedIn
+}) {
 	const selectedLabels = useSelector(selectSelectedLabels);
 	const dispatch = useAppDispatch();
 	const { data: labels } = useGetCalendarLabelsQuery();
@@ -25,7 +28,20 @@ function CalendarAppSidebar() {
 			>
 				Calendar
 			</motion.span>
-
+			<div className='flex w-full mb-14'>
+				<button
+					aria-label="Sign in with Google"
+					className="flex w-full gap-3 items-center bg-white border border-google-button-border-light rounded-4 p-6"
+					onClick={handleGoogleLogin}
+				>
+					<div className="flex items-center justify-center bg-white w-32 h-32">
+						<Iconify icon='logos:google-calendar' width={32} />
+					</div>
+					<span className="text-md text-google-text-gray tracking-wider">
+						{isSignedIn ? 'Desconectar o Google Agenda' : 'Sincronizar o Google Agenda'}
+					</span>
+				</button>
+			</div>
 			<div className="group flex items-center justify-between mb-12">
 				<Typography
 					className="text-15 font-600 leading-none"

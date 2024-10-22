@@ -19,6 +19,9 @@ import FuseLoading from '@fuse/core/FuseLoading';
 import { useGetInstancesAllQuery } from 'src/app/main/pages/Instances/InstanceApi';
 import { useSelector } from 'react-redux';
 import { selectUser } from 'src/app/auth/user/store/userSlice';
+import Stack from '@mui/material/Stack';
+import { supabase } from '@mock-api/api/trigger-api';
+import Button from '@mui/material/Button';
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -44,17 +47,111 @@ function BasicInfoTab() {
 		{ instanceId: user.customer.id },
 		{ skip: !user.customer.id }) as any;
 	const { data: contactGroup, isLoading: isContactsLoading } = useGetContactsQuery();
-	const [file, setFile] = useState<File | string | null>(null);
 	const openInstances = instances?.filter(instance => instance.connectionStatus === "open");
+
+	const [file, setFile] = useState<File | null>(null);
+
+	const [uploading, setUploading] = useState(false);
+	const [message, setMessage] = useState('');
+
+	const allowedTypes = [
+		"image/jpeg",
+		"image/png",
+		"image/gif",
+		"image/webp",
+		"video/mp4",
+		"video/quicktime",
+		"audio/mpeg",
+		"audio/aac",
+		"audio/ogg",
+		"audio/wav",
+		"application/pdf",
+		"application/msword",
+		"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+		"application/vnd.ms-excel",
+		"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+		"text/csv",
+		"text/plain"
+	];
+
+	const maxFileSize = (type) => {
+		const fileTypes = ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "text/csv", "text/plain"];
+		return fileTypes.includes(type) ? 100 * 1024 * 1024 : 16 * 1024 * 1024;
+	};
 
 	const handleDropSingleFile = useCallback((acceptedFiles: File[]) => {
 		const newFile = acceptedFiles[0];
-		setFile(newFile);
+
+		if (!allowedTypes.includes(newFile.type)) {
+			console.error('File type not allowed');
+			return;
+		}
+
+		if (newFile.size > maxFileSize(newFile.type)) {
+			console.error('File size exceeds the limit');
+			return;
+		}
+		const fileType = newFile.type;
+		const fileExtension = newFile.name.split('.').pop();
+
+		const reader = new FileReader();
+		reader.onloadend = () => {
+			const base64 = reader.result as string;
+			const formData = new FormData();
+			formData.append('file', base64);
+			setFile(newFile);
+
+			let mediaType = 'document';
+			if (fileType.startsWith('image')) {
+				mediaType = 'image';
+			} else if (fileType.startsWith('audio')) {
+				mediaType = 'audio';
+			}
+			setValue('file', {
+				type: newFile.type,
+				mediaType: mediaType,
+				extension: fileExtension
+			});
+
+		};
+		reader.readAsDataURL(newFile);
+
 	}, []);
 
 	if (isInstancesLoading || isContactsLoading) {
 		return <FuseLoading />;
 	}
+
+	const handleUpload = async () => {
+		try {
+			if (!file) {
+				setMessage('Please select a file to upload');
+				return;
+			}
+
+			setUploading(true);
+
+			const fileExt = file?.name.split('.').pop();
+			const fileName = `${Math.random()}.${fileExt}`;
+			const filePath = `uploads/${fileName}`;
+
+			const { data: dataUpload, error }: any = await supabase.storage.from('media').upload(filePath, file);
+
+			if (error) {
+				throw error;
+			}
+
+			const { data: dataPublic } = supabase.storage.from('media').getPublicUrl(filePath);
+
+			setValue('publicUrl', dataPublic.publicUrl);
+
+			setMessage(`File uploaded successfully. URL: ${dataPublic.publicUrl}`);
+		} catch (error) {
+			setMessage(`Error uploading file: ${error.message}`);
+		} finally {
+			setUploading(false);
+		}
+	};
 
 	const getCombinedContacts = (ids) => {
 		const selectedContacts = ids.map(id => _.find(contactGroup, { id }) || {});
@@ -230,7 +327,6 @@ function BasicInfoTab() {
 							.filter((item): item is ScrumboardMember => typeof item !== 'string')
 							.map((item) => item.id);
 						const combinedContacts = getCombinedContacts(ids);
-						console.log(`combinedContacts`, combinedContacts)
 						setValue('contacts', combinedContacts)
 						setValue('contactIds', ids);
 					}}
@@ -265,10 +361,38 @@ function BasicInfoTab() {
 
 			<div className="flex-1 mb-24">
 				<div className="flex items-center mt-16 mb-12">
-					<Iconify icon="solar:file-download-bold-duotone" width={20} />
+					<Iconify icon="solar:cloud-file-bold-duotone" width={20} />
 					<Typography className="font-semibold text-16 mx-8">Arquivo de Mídia</Typography>
 				</div>
-				<Upload value={file} onDrop={handleDropSingleFile} onDelete={() => setFile(null)} />
+				<Upload
+					value={file || cardForm?.publicUrl}
+					onDrop={handleDropSingleFile}
+					onDelete={() => setFile(null)}
+					placeholder={
+						<Stack spacing={0.5} alignItems="center">
+							<Iconify icon="solar:file-send-bold-duotone" width={48} />
+							<Typography variant="body2">Drop or select file</Typography>
+						</Stack>
+					}
+					sx={{ py: 2.5, height: 'auto', width: '100%' }}
+				/>
+
+				{file &&
+					<>
+						<Stack direction="row" justifyContent="flex-end" spacing={1.5}>
+							<Button
+								size="small"
+								variant="contained"
+								disabled={uploading}
+								onClick={handleUpload}
+								startIcon={<Iconify icon="eva:cloud-upload-fill" />}
+							>
+								{uploading ? 'Uploading...' : 'Upload'}
+							</Button>
+						</Stack>
+						{message && <p>{message}</p>}
+					</>
+				}
 			</div>
 			<Controller
 				name="conversation"

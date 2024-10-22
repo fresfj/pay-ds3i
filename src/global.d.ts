@@ -31,6 +31,7 @@ interface HotModule {
 }
 
 interface Window {
+  gapi: any
   fbAsyncInit: () => void
   FB: {
     ui: any

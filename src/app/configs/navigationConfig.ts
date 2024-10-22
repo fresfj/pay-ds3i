@@ -254,17 +254,17 @@ const navigationConfig: FuseNavItemType[] = [
             end: true
           },
           {
-            id: 'leads',
-            title: 'Leads',
-            type: 'item',
-            url: 'apps/settings/contacts',
-            end: true
-          },
-          {
             id: 'trigger',
             title: 'Disparo',
             type: 'item',
             url: 'apps/settings/trigger',
+            end: true
+          },
+          {
+            id: 'contact-group',
+            title: 'Grupo de Contato',
+            type: 'item',
+            url: 'apps/settings/contacts',
             end: true
           },
           {

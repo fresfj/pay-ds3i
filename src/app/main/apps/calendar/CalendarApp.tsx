@@ -1,9 +1,11 @@
 import { styled } from '@mui/material/styles';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import googleCalendarPlugin from '@fullcalendar/google-calendar';
+
 import FusePageSimple from '@fuse/core/FusePageSimple';
 import useThemeMediaQuery from '@fuse/hooks/useThemeMediaQuery';
 import { useAppDispatch } from 'app/store/store';
@@ -25,7 +27,25 @@ import { openEditEventDialog, openNewEventDialog } from './store/eventDialogSlic
 import CalendarAppSidebar from './CalendarAppSidebar';
 import CalendarAppEventContent from './CalendarAppEventContent';
 import { Event, useGetCalendarEventsQuery, useUpdateCalendarEventMutation } from './CalendarApi';
+import ApiCalendar from 'react-google-calendar-api';
+
+const googleClientId = '1050503771215-lsi40tbdsaasuic72dggicm4sl2ngiru.apps.googleusercontent.com'
+const googleApiKey = 'AIzaSyDjN_urRdFrtB8tjx4YqabsAUtDMb0_Cmw'
+const SCOPES = "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/calendar";
+
+const config = {
+	"clientId": googleClientId,
+	"apiKey": googleApiKey,
+	"scope": "https://www.googleapis.com/auth/calendar",
+	"discoveryDocs": [
+		"https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"
+	]
+}
+
+const apiCalendar = new ApiCalendar(config)
 import reducer from './store';
+import { selectSelectedLabels } from './store/selectedLabelsSlice';
+import { useSelector } from 'react-redux';
 
 const Root = styled(FusePageSimple)(({ theme }) => ({
 	'& a': {
@@ -105,11 +125,136 @@ const Root = styled(FusePageSimple)(({ theme }) => ({
 function CalendarApp() {
 	const [currentDate, setCurrentDate] = useState<DatesSetArg>();
 	const dispatch = useAppDispatch();
-	const { data: events, isLoading } = useGetCalendarEventsQuery();
+	const { data: calendarData, isLoading } = useGetCalendarEventsQuery();
+	const selectedLabels = useSelector(selectSelectedLabels);
 	const calendarRef = useRef<FullCalendar>(null);
 	const isMobile = useThemeMediaQuery((theme) => theme.breakpoints.down('lg'));
 	const [leftSidebarOpen, setLeftSidebarOpen] = useState(!isMobile);
 	const [updateEvent] = useUpdateCalendarEventMutation();
+	const [events, setEvents] = useState<any[]>([]);
+	const [isSignedIn, setIsSignedIn] = useState(false);
+	const [googleEvents, setGoogleEvents] = useState<any[]>([]);
+
+	const filterEventsByLabels = useCallback(
+		(events) => events.filter((event) => selectedLabels.includes(event?.extendedProps?.label as string)),
+		[selectedLabels]
+	);
+
+	useEffect(() => {
+		if (!isLoading) {
+			const allEvents = [...(calendarData || []), ...googleEvents];
+			const filteredEvents = filterEventsByLabels(allEvents);
+			setEvents(filteredEvents);
+		}
+	}, [calendarData, googleEvents, selectedLabels, isLoading, filterEventsByLabels]);
+
+	useEffect(() => {
+		const script = document.createElement('script');
+		script.async = true;
+		script.defer = true;
+		script.src = 'https://apis.google.com/js/api.js';
+		script.onload = () => {
+			window.gapi.load('client:auth2', () => {
+				if (calendarData && !isLoading) {
+					initClient()
+				}
+			});
+		};
+		document.body.appendChild(script);
+	}, [calendarData, isLoading]);
+
+	const initClient = useCallback(() => {
+		const startOfMonth = new Date(new Date().setDate(1)).toISOString();
+		const endOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).toISOString();
+
+		if (!localStorage.getItem('access_token')) {
+			handleGoogleLogin();
+		} else {
+			fetchGoogleCalendarEvents(startOfMonth, endOfMonth);
+		}
+	}, []);
+
+	const fetchGoogleCalendarEvents = (startOfMonth: string, endOfMonth: string) => {
+		fetch(
+			`https://www.googleapis.com/calendar/v3/calendars/primary/events?key=${googleApiKey}&orderBy=startTime&singleEvents=true&timeMin=${startOfMonth}&timeMax=${endOfMonth}`,
+			{ headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` } }
+		)
+			.then((res) => {
+				if (res.status !== 401) {
+					return res.json();
+				} else {
+					localStorage.removeItem('access_token');
+					handleGoogleLogin();
+				}
+			})
+			.then((data) => {
+				if (data?.items) {
+					const googleEvents = formatEvents(data.items);
+					setGoogleEvents(googleEvents);
+					setIsSignedIn(true);
+				}
+			});
+	};
+
+	const formatEvents = useCallback(
+		(list) =>
+			list.map((event) => ({
+				id: event.id,
+				extendedProps: {
+					desc: event.description,
+					label: '1b13d7a7f529',
+				},
+				allDay: false,
+				title: event.summary,
+				start: event.start.dateTime || event.start.date,
+				end: event.end.dateTime || event.end.date,
+			})),
+		[]
+	);
+
+	const listUpcomingEvents = () => {
+		window.gapi.client.calendar.events
+			.list({
+				calendarId: "primary",
+				showDeleted: true,
+				singleEvents: true,
+			})
+			.then(function (response) {
+				let events = response.result.items;
+
+				if (events.length > 0) {
+					const googleEvents = formatEvents(events);
+					setGoogleEvents(googleEvents);
+				}
+			});
+	};
+
+	const openSignInPopup = () => {
+		window.gapi.auth2.authorize(
+			{ client_id: googleClientId, scope: SCOPES },
+			(res) => {
+				if (res && res.access_token) {
+					localStorage.setItem('access_token', res.access_token);
+					window.gapi.client.load('calendar', 'v3', listUpcomingEvents);
+				}
+			}
+		);
+	};
+
+	const loadEventsForCurrentMonth = () => {
+		const calendarApi = calendarRef.current?.getApi();
+		if (!calendarApi) return;
+		const view = calendarApi?.view;
+		const startOfMonth = new Date(view.currentStart).toISOString();
+		const endOfMonth = new Date(view.currentEnd).toISOString();
+		fetchGoogleCalendarEvents(startOfMonth, endOfMonth);
+	};
+
+	const handleGoogleLogin = () => {
+		apiCalendar.handleAuthClick().then((response: any) => {
+			localStorage.setItem("access_token", response.access_token);
+		});
+	};
 
 	useEffect(() => {
 		setLeftSidebarOpen(!isMobile);
@@ -132,6 +277,8 @@ function CalendarApp() {
 			id,
 			title,
 			allDay,
+			instance: '',
+			contacts: [],
 			start: start?.toISOString() ?? '',
 			end: end?.toISOString() ?? '',
 			extendedProps
@@ -145,6 +292,7 @@ function CalendarApp() {
 
 	const handleDates = (rangeInfo: DatesSetArg) => {
 		setCurrentDate(rangeInfo);
+		loadEventsForCurrentMonth();
 	};
 
 	const handleEventAdd = (addInfo: EventAddArg) => {
@@ -182,7 +330,7 @@ function CalendarApp() {
 				}
 				content={
 					<FullCalendar
-						plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+						plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, googleCalendarPlugin]}
 						headerToolbar={false}
 						initialView="dayGridMonth"
 						editable
@@ -202,11 +350,11 @@ function CalendarApp() {
 						eventChange={handleEventChange}
 						eventRemove={handleEventRemove}
 						eventDrop={handleEventDrop}
-						initialDate={new Date(2022, 3, 1)}
+						initialDate={new Date()}
 						ref={calendarRef}
 					/>
 				}
-				leftSidebarContent={<CalendarAppSidebar />}
+				leftSidebarContent={<CalendarAppSidebar handleGoogleLogin={handleGoogleLogin} isSignedIn={isSignedIn} />}
 				leftSidebarOpen={leftSidebarOpen}
 				leftSidebarOnClose={() => setLeftSidebarOpen(false)}
 				leftSidebarWidth={240}

@@ -3,7 +3,6 @@ import { useDropzone } from 'react-dropzone';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
-import FormHelperText from '@mui/material/FormHelperText';
 import { varAlpha } from 'src/theme/styles';
 
 import { Iconify } from '../iconify';
@@ -11,8 +10,7 @@ import { Iconify } from '../iconify';
 import type { UploadProps } from './types';
 import { MultiFilePreview } from './components/preview-multi-file';
 import { RejectionFiles } from './components/rejection-files';
-import { UploadPlaceholder } from './components/placeholder';
-import { DeleteButton, SingleFilePreview } from './components/preview-single-file';
+
 // ----------------------------------------------------------------------
 
 export function UploadBox({
@@ -37,8 +35,6 @@ export function UploadBox({
   });
 
   const isArray = Array.isArray(value) && multiple;
-
-  const hasFile = !isArray && !!value;
 
   const hasFiles = isArray && !!value.length;
 

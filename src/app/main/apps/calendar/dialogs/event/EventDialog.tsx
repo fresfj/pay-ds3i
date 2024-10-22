@@ -8,7 +8,7 @@ import TextField from '@mui/material/TextField';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { MouseEvent, useCallback, useEffect } from 'react';
 import _ from '@lodash';
-import { Popover } from '@mui/material';
+import { Autocomplete, Box, Checkbox, FormControl, InputLabel, MenuItem, Popover, Select } from '@mui/material';
 import FuseSvgIcon from '@fuse/core/FuseSvgIcon';
 import { useAppDispatch } from 'app/store/store';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -42,8 +42,12 @@ const schema = z.object({
 			label: z.string().optional()
 		})
 		.optional()
+	// scheduleMessage: z.boolean().optional(),
+	// instance: z.array(z.string()).optional(),
+	// contacts: z.array(z.string()).optional()
 });
-
+const instances = [{ id: 1, title: "Instance 1" }, { id: 2, title: "Instance 2" }, { id: 3, title: "Instance 3" }];
+const contacts = [{ id: 1, title: "Contact 1" }, { id: 2, title: "Contact 2" }, { id: 3, title: "Contact 3" }];
 /**
  * The event dialog.
  */
@@ -67,6 +71,8 @@ function EventDialog() {
 	const start = watch('start');
 	const end = watch('end');
 	const id = watch('id');
+
+	const form = watch();
 
 	/**
 	 * Initialize Dialog with Data
@@ -181,6 +187,106 @@ function EventDialog() {
 						)}
 					/>
 				</div>
+				<div className="flex sm:space-x-24 mb-16">
+					<FormControlLabel
+						label="Schedule Message"
+						control={
+							<Controller
+								name="scheduleMessage"
+								control={control}
+								render={({ field: { onChange, value } }) => (
+									<Switch onChange={(ev) => { onChange(ev.target.checked); }} checked={value} name="scheduleMessage" />
+								)}
+							/>
+						}
+					/>
+				</div>
+				{form.scheduleMessage && (
+					<>
+						<div className="flex sm:space-x-24 mb-16">
+							<FuseSvgIcon
+								className="hidden sm:inline-flex mt-16"
+								color="action"
+							>
+								heroicons-outline:chat-alt-2
+							</FuseSvgIcon>
+							<Controller
+								name="instance"
+								control={control}
+								render={({ field }) => (
+									<FormControl sx={{ mt: 2 }}
+										className="mt-8 mb-16 w-full"
+									>
+										<InputLabel htmlFor="max-width">Instance</InputLabel>
+										<Select
+											labelId="select-instances"
+											id="label-instances"
+											{...field}
+											label="Instance"
+											variant="outlined"
+											fullWidth
+											classes={{ select: 'flex items-center space-x-12' }}
+										>
+											{instances?.map((label) => (
+												<MenuItem
+													value={label.id}
+													key={label.id}
+													className="space-x-12"
+												>
+													<span>{label.title}</span>
+												</MenuItem>
+											))}
+										</Select>
+									</FormControl>
+								)}
+							/>
+						</div>
+						<div className="flex sm:space-x-24 mb-16">
+							<FuseSvgIcon
+								className="hidden sm:inline-flex mt-16"
+								color="action"
+							>
+								heroicons-outline:users
+							</FuseSvgIcon>
+							<Controller
+								name="contacts"
+								control={control}
+								render={({ field: { onChange, value } }) => (
+									<Autocomplete
+										multiple
+										id="tags"
+										className="mt-8 mb-16 w-full"
+										options={contacts || []}
+										disableCloseOnSelect
+										getOptionLabel={(option: any) => option?.title}
+										renderOption={(_props, option: any, { selected }) => (
+											<li {..._props}>
+												<Checkbox
+													style={{ marginRight: 8 }}
+													checked={selected}
+												/>
+												{option?.title}
+											</li>
+										)}
+										value={value ? value.map((id) => _.find(contacts, { id })) : []}
+										onChange={(event, newValue) => {
+											onChange(newValue.map((item: any) => item.id));
+										}}
+										fullWidth
+										renderInput={(params) => (
+											<TextField
+												{...params}
+												label="Schedule Contacts"
+												variant="outlined"
+												placeholder="Select contacts"
+											/>
+										)}
+									/>
+								)}
+							/>
+						</div>
+					</>
+				)}
 
 				<div className="flex sm:space-x-24 mb-16">
 					<FuseSvgIcon
@@ -209,46 +315,48 @@ function EventDialog() {
 									/>
 								)}
 							/>
-
+							{!form.scheduleMessage && (
+								<Controller
+									name="end"
+									control={control}
+									render={({ field: { onChange, value } }) => (
+										<DateTimePicker
+											className="mt-8 mb-16 w-full"
+											value={new Date(value)}
+											onChange={onChange}
+											slotProps={{
+												textField: {
+													label: 'End',
+													variant: 'outlined'
+												}
+											}}
+											minDate={start}
+										/>
+									)}
+								/>
+							)}
+						</div>
+						{!form.scheduleMessage && (
 							<Controller
-								name="end"
+								name="allDay"
 								control={control}
 								render={({ field: { onChange, value } }) => (
-									<DateTimePicker
-										className="mt-8 mb-16 w-full"
-										value={new Date(value)}
-										onChange={onChange}
-										slotProps={{
-											textField: {
-												label: 'End',
-												variant: 'outlined'
-											}
-										}}
-										minDate={start}
+									<FormControlLabel
+										className="mt-8"
+										label="All Day"
+										control={
+											<Switch
+												onChange={(ev) => {
+													onChange(ev.target.checked);
+												}}
+												checked={value}
+												name="allDay"
+											/>
+										}
 									/>
 								)}
 							/>
-						</div>
-
-						<Controller
-							name="allDay"
-							control={control}
-							render={({ field: { onChange, value } }) => (
-								<FormControlLabel
-									className="mt-8"
-									label="All Day"
-									control={
-										<Switch
-											onChange={(ev) => {
-												onChange(ev.target.checked);
-											}}
-											checked={value}
-											name="allDay"
-										/>
-									}
-								/>
-							)}
-						/>
+						)}
 					</div>
 				</div>
 

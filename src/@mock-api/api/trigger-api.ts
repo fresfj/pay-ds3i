@@ -1,6 +1,11 @@
 import _ from '@lodash'
 import FuseUtils from '@fuse/utils'
 import mockApi from '../mock-api.json'
+import { createClient } from '@supabase/supabase-js'
+const supabaseUrl = 'https://lhovnmbmxqbsqgtxxrvw.supabase.co'
+const supabaseKey =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxob3ZubWJteHFic3FndHh4cnZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjkzNzE0NTQsImV4cCI6MjA0NDk0NzQ1NH0.AvPla89NeTnwJcBQeVZ7iKQKpma1Qayt1RPVEG4Qbow'
+export const supabase = createClient(supabaseUrl, supabaseKey)
 
 import ExtendedMockAdapter, { Params } from '../ExtendedMockAdapter'
 import {
@@ -130,7 +135,7 @@ export const triggerApiMocks = (mock: ExtendedMockAdapter) => {
 
   mock.onPut('/trigger/campaign/:id').reply(config => {
     const { id } = config.params as Params
-    const campaign = JSON.parse(config.data as string) as EcommerceCoupon
+    const campaign = JSON.parse(config.data as string) as any
     //
     const campaignRef = firebase.firestore().collection('campaigns').doc(id)
     return new Promise(async (resolve, reject) => {
@@ -141,10 +146,12 @@ export const triggerApiMocks = (mock: ExtendedMockAdapter) => {
         } as EcommerceCoupon
         await campaignRef.update(newcampaign)
 
-        await axios.post(
-          'https://webhook2.richeli.dev/webhook/bfb095d3-454d',
-          campaign
-        )
+        if (campaign?.status !== 'COMPLETED' && campaign?.closedAt) {
+          await axios.post(
+            'https://webhook2.richeli.dev/webhook/bfb095d3-454d',
+            newcampaign
+          )
+        }
 
         resolve([200, newcampaign])
       } catch (error) {
@@ -194,6 +201,12 @@ export const triggerApiMocks = (mock: ExtendedMockAdapter) => {
           createdAt: new Date(),
           updatedAt: new Date()
         }
+
+        await axios.post(
+          'https://webhook2.richeli.dev/webhook/bfb095d3-454d',
+          campaignNew
+        )
+
         campaignRef.set(campaignNew)
         resolve([200, campaignNew])
       } catch (error) {

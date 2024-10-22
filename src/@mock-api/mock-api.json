@@ -25416,6 +25416,11 @@
             "id": "09887870-f85a-40eb-8171-1b13d7a7f529",
             "title": "Appointments",
             "color": "#D63E63"
+          },
+          {
+            "id": "1b13d7a7f529",
+            "title": "Google Calendar",
+            "color": "#4285f4"
           }
         ]
       },

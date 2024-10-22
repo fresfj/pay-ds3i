@@ -13,7 +13,7 @@ import { RejectionFiles } from './components/rejection-files';
 import { MultiFilePreview } from './components/preview-multi-file';
 import { DeleteButton, SingleFilePreview } from './components/preview-single-file';
 
-import type { UploadProps } from './types';
+import type { SingleFilePreviewProps, UploadProps } from './types';
 
 // ----------------------------------------------------------------------
 
@@ -25,6 +25,7 @@ export function Upload({
   onDelete,
   onUpload,
   onRemove,
+  placeholder,
   thumbnail,
   helperText,
   onRemoveAll,
@@ -72,6 +73,8 @@ export function Upload({
     </>
   );
 
+  const isImage = (value instanceof File) && value.type.startsWith('image');
+
   return (
     <Box sx={{ width: 1, position: 'relative', ...sx }}>
       <Box
@@ -94,13 +97,14 @@ export function Upload({
             borderColor: 'error.main',
             bgcolor: (theme) => varAlpha(theme.palette.error.main, 0.08),
           }),
-          ...(hasFile && { padding: '28% 0' }),
+          ...(hasFile && { padding: isImage ? '28% 0' : '18% 0' }),
         }}
       >
         <input {...getInputProps()} />
 
         {/* Single file */}
-        {hasFile ? <SingleFilePreview file={value as File} /> : <UploadPlaceholder />}
+        {hasFile ? <SingleFilePreview file={value as File} /> : placeholder || <Iconify icon="eva:cloud-upload-fill" width={28} />}
+
       </Box>
 
       {/* Single file */}

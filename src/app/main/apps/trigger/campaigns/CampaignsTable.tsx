@@ -253,7 +253,7 @@ function CouponsTable(props: CouponsTableProps) {
 													Falhas {results.statusCounts[3] ? results.statusCounts[3] : '0'}
 													<Iconify icon="solar:chat-dots-bold-duotone" className='text-orange-A400' />
 													Pendentes {results.statusCounts[1] ? results.statusCounts[1] :
-														results.statusCounts[2] ? '0' : n.contacts.length}
+														results.statusCounts[2] ? '0' : n.contacts?.length}
 													<Iconify icon="solar:chat-square-check-bold-duotone" className='text-green-A400' />
 													Enviados {results.statusCounts[2] ? results.statusCounts[2] : '0'}
 												</Box>
@@ -281,7 +281,7 @@ function CouponsTable(props: CouponsTableProps) {
 											align="right"
 										>
 											<Iconify icon="solar:users-group-rounded-bold-duotone" width={22} sx={{ mr: 1 }} />
-											{n.contacts.length}
+											{n.contacts?.length}
 										</TableCell>
 
 										<TableCell

@@ -9,7 +9,7 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Toolbar from '@mui/material/Toolbar';
 import { Controller, useForm } from 'react-hook-form';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import _ from '@lodash';
 import { useDebounce, useDeepCompareEffect } from '@fuse/hooks';
 import { lighten } from '@mui/material/styles';
@@ -19,6 +19,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useDeleteInstanceMutation, useUpdateInstanceMutation } from '../../../InstanceApi';
 import { Iconify } from '@fuse/components/iconify';
+import Collapse from '@mui/material/Collapse';
 
 
 type BoardSettingsSidebarProps = {
@@ -36,6 +37,11 @@ function InstanceSettingsSidebar(props: BoardSettingsSidebarProps) {
 
 	const [updateBoard] = useUpdateInstanceMutation();
 	const [deleteBoard] = useDeleteInstanceMutation();
+
+	const [open, setOpen] = useState(true);
+	const handleClick = () => {
+		setOpen(!open);
+	};
 
 	const settings = {
 		rejectCall: instance?.Setting?.rejectCall || false,
@@ -124,7 +130,7 @@ function InstanceSettingsSidebar(props: BoardSettingsSidebarProps) {
 			<List className="py-24">
 				<ListItem>
 					<ListItemIcon className="min-w-40">
-						<Iconify icon="solar:call-cancel-bold-duotone" />
+						<Iconify icon="solar:call-cancel-bold-duotone" width={28} />
 					</ListItemIcon>
 					<ListItemText primary="Rejeitar Chamadas" secondary="Rejeitar todas as chamadas" />
 					<ListItemSecondaryAction>
@@ -144,7 +150,7 @@ function InstanceSettingsSidebar(props: BoardSettingsSidebarProps) {
 				</ListItem>
 				<ListItem>
 					<ListItemIcon className="min-w-40">
-						<Iconify icon="solar:chat-unread-bold-duotone" />
+						<Iconify icon="solar:chat-unread-bold-duotone" width={28} />
 					</ListItemIcon>
 					<ListItemText primary="Ignorar Grupos" secondary="Ignorar todas as mensagens de grupos" />
 					<ListItemSecondaryAction>
@@ -164,7 +170,7 @@ function InstanceSettingsSidebar(props: BoardSettingsSidebarProps) {
 				</ListItem>
 				<ListItem>
 					<ListItemIcon className="min-w-40">
-						<Iconify icon="solar:call-chat-bold-duotone" />
+						<Iconify icon="solar:call-chat-bold-duotone" width={28} />
 					</ListItemIcon>
 					<ListItemText primary="Sempre Online" secondary="Permanecer sempre online" />
 					<ListItemSecondaryAction>
@@ -185,7 +191,7 @@ function InstanceSettingsSidebar(props: BoardSettingsSidebarProps) {
 				</ListItem>
 				<ListItem>
 					<ListItemIcon className="min-w-40">
-						<Iconify icon="solar:chat-square-check-bold-duotone" />
+						<Iconify icon="solar:chat-square-check-bold-duotone" width={28} />
 					</ListItemIcon>
 					<ListItemText primary="Visualizar Mensagens" secondary="Marcar todas as mensagens como lidas" />
 					<ListItemSecondaryAction>
@@ -206,7 +212,7 @@ function InstanceSettingsSidebar(props: BoardSettingsSidebarProps) {
 				</ListItem>
 				<ListItem>
 					<ListItemIcon className="min-w-40">
-						<Iconify icon="solar:server-square-cloud-bold-duotone" />
+						<Iconify icon="solar:server-square-cloud-bold-duotone" width={28} />
 					</ListItemIcon>
 					<ListItemText primary="Sincronizar Histórico Completo" secondary="Sincronizar o histórico completo ao ler o QR Code" />
 					<ListItemSecondaryAction>
@@ -227,7 +233,7 @@ function InstanceSettingsSidebar(props: BoardSettingsSidebarProps) {
 				</ListItem>
 				<ListItem>
 					<ListItemIcon className="min-w-40">
-						<Iconify icon="solar:cloud-check-bold-duotone" />
+						<Iconify icon="solar:cloud-check-bold-duotone" width={28} />
 					</ListItemIcon>
 					<ListItemText primary="Visualizar Status" secondary="Marcar todos os status como visualizados" />
 					<ListItemSecondaryAction>
@@ -246,18 +252,35 @@ function InstanceSettingsSidebar(props: BoardSettingsSidebarProps) {
 						/>
 					</ListItemSecondaryAction>
 				</ListItem>
-
-
-				<ListItemButton
-					onClick={() => {
-
-					}}
-				>
-					<ListItemIcon className="min-w-40">
-						<FuseSvgIcon>heroicons-outline:trash</FuseSvgIcon>
+				<ListItemButton onClick={handleClick}>
+					<ListItemIcon>
+						<Iconify icon="solar:plug-circle-bold" width={28} />
 					</ListItemIcon>
-					<ListItemText primary="Delete Instância" />
+					<ListItemText primary="Integrations" />
+					{open ? <Iconify icon="eva:arrow-ios-upward-fill" width={28} /> : <Iconify icon="eva:arrow-ios-downward-fill" width={28} />}
 				</ListItemButton>
+				<Collapse in={open} timeout="auto" unmountOnExit>
+					<List component="div" disablePadding>
+						<ListItemButton sx={{ pl: 4 }}>
+							<ListItemIcon>
+								<Iconify icon="fluent:bot-sparkle-24-regular" width={28} />
+							</ListItemIcon>
+							<ListItemText primary="Dify" secondary="AI Agents" />
+						</ListItemButton>
+						<ListItemButton sx={{ pl: 4 }}>
+							<ListItemIcon>
+								<Iconify icon="fluent:bot-sparkle-24-regular" width={28} />
+							</ListItemIcon>
+							<ListItemText primary="OpenAI" secondary="AI Agents" />
+						</ListItemButton>
+						<ListItemButton sx={{ pl: 4 }}>
+							<ListItemIcon>
+								<Iconify icon="fluent:bot-sparkle-24-regular" width={28} />
+							</ListItemIcon>
+							<ListItemText primary="Typebot" secondary="AI Workflows" />
+						</ListItemButton>
+					</List>
+				</Collapse>
 			</List>
 		</div>
 	);
