@@ -11,6 +11,37 @@ import type { SingleFilePreviewProps } from '../types';
 import { FileThumbnail } from '../../file-thumbnail';
 
 // ----------------------------------------------------------------------
+function isValidUrl(url) {
+  try {
+    new URL(url);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function getFileType(url) {
+  if (!isValidUrl(url)) {
+    return 'invalid';
+  }
+  const extension = url.split('.').pop().split('?')[0];
+  const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+  const audioExtensions = ['mp3', 'wav', 'ogg', 'm4a', 'flac'];
+  const videoExtensions = ['mp4', 'mkv', 'webm', 'mov', 'avi'];
+  const documentExtensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'csv', 'txt'];
+
+  if (imageExtensions.includes(extension)) {
+    return 'image';
+  } else if (audioExtensions.includes(extension)) {
+    return 'audio';
+  } else if (videoExtensions.includes(extension)) {
+    return 'video';
+  } else if (documentExtensions.includes(extension)) {
+    return 'document';
+  } else {
+    return 'unknown';
+  }
+}
 
 export function SingleFilePreview({ file }: SingleFilePreviewProps) {
   const fileName = typeof file === 'string' ? file : file.name;
@@ -18,6 +49,9 @@ export function SingleFilePreview({ file }: SingleFilePreviewProps) {
   const isAudio = typeof file !== 'string' && file.type.startsWith('audio');
   const isImage = typeof file !== 'string' && file.type.startsWith('image');
 
+  const fileType = getFileType(file);
+
+  console.log(`file`, fileType)
   return (
     <Box
       sx={{
@@ -45,7 +79,7 @@ export function SingleFilePreview({ file }: SingleFilePreviewProps) {
             boxShadow: (theme) => theme.shadows[3],
           }}
         />
-      ) : isImage ? (
+      ) : isImage || fileType === 'image' ? (
         <Box
           component="img"
           alt={fileName}

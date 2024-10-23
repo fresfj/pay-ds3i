@@ -19,6 +19,9 @@ import CouponModel from './models/CouponModel';
 import RulesTab from './tabs/RulesTab';
 import ReportTab from './tabs/ReportTab';
 
+const now = new Date();
+const minDate = new Date(now.getTime() + 30 * 60 * 1000);
+
 /**
  * Form Validation Schema
  */
@@ -26,6 +29,10 @@ const schema = z.object({
 	name: z.string().nonempty('You must enter a coupon name').min(5, 'The coupon name must be at least 5 characters'),
 	description: z.string().nonempty('You must enter a description').min(5, 'The description must be at least 5 characters'),
 	conversation: z.string().nonempty('You must enter a conversation').min(5, 'The conversation must be at least 5 conversation'),
+	startDate: z.date()
+		.refine((date) => date >= minDate, {
+			message: 'The start date must be at least 30 minutes from now',
+		})
 });
 
 /**
@@ -51,7 +58,14 @@ function Campaign() {
 
 	const methods = useForm({
 		mode: 'onChange',
-		defaultValues: {},
+		defaultValues: {
+			name: '',
+			description: '',
+			conversation: '',
+			startDate: '',
+			intervalMin: 45,
+			intervalMax: 60
+		},
 		resolver: zodResolver(schema)
 	});
 
@@ -115,7 +129,6 @@ function Campaign() {
 	 * Wait while coupon data is loading and form is setted
 	 */
 
-	console.log(routeParams.triggerId, campaign?.id)
 	if (_.isEmpty(form) || (campaign && routeParams.triggerId !== campaign?.id && routeParams.triggerId !== 'new')) {
 		return <FuseLoading />;
 	}

@@ -93,12 +93,12 @@ function ReportTab() {
 	const theme = useTheme();
 	const logs = watch('logs')
 	const chartColors2 = [theme.palette.secondary.main, theme.palette.warning.main];
-	const chartData: any = processDataForChart(logs);
 
-	if (!chartData) {
+	if (!logs) {
 		return null
 	}
 
+	const chartData: any = processDataForChart(logs);
 	const totals = calculateTotals(chartData?.series);
 
 	const handleOpenDialog = () => {

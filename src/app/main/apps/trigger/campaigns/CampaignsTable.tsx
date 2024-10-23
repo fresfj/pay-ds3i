@@ -26,6 +26,7 @@ import { Iconify } from '@fuse/components/iconify';
 import { styled } from '@mui/material/styles';
 import moment from 'moment'
 import 'moment/locale/pt-br';
+import { FileThumbnail } from '@fuse/components/file-thumbnail';
 moment.locale('pt-br');
 
 type CouponsTableProps = WithRouterProps & {
@@ -197,6 +198,8 @@ function CouponsTable(props: CouponsTableProps) {
 									statusCounts: [],
 									percentages: 0
 								}
+
+								console.log(n)
 								return (
 									<TableRow
 										className="h-72 cursor-pointer"
@@ -218,6 +221,7 @@ function CouponsTable(props: CouponsTableProps) {
 												onChange={(event) => handleCheck(event, n.id)}
 											/>
 										</TableCell>
+
 										<TableCell
 											className="p-4 md:p-16 truncate"
 											component="th"
@@ -275,20 +279,41 @@ function CouponsTable(props: CouponsTableProps) {
 										</TableCell>
 
 										<TableCell
-											className="p-4 md:p-16"
+											className="p-4"
 											component="th"
 											scope="row"
 											align="right"
 										>
-											<Iconify icon="solar:users-group-rounded-bold-duotone" width={22} sx={{ mr: 1 }} />
-											{n.contacts?.length}
-										</TableCell>
 
+											<Typography className='text-lg font-semibold'>
+												<Iconify icon="solar:users-group-rounded-bold-duotone" width={32} sx={{ mr: 1 }} />
+												{n.contacts?.length}
+											</Typography>
+										</TableCell>
 										<TableCell
-											className="p-4 md:p-16"
+											className='w-80'
 											component="th"
 											scope="row"
-											align="right"
+											align='center'
+										>
+											{n?.publicUrl &&
+												<FileThumbnail
+													tooltip
+													imageView
+													file={n?.publicUrl}
+													sx={{
+														width: 46,
+														height: 46
+													}}
+													slotProps={{ icon: { width: 36, height: 36 } }}
+												/>
+											}
+										</TableCell>
+										<TableCell
+											className="p-4 w-68 md:p-16"
+											component="th"
+											scope="row"
+											align="center"
 										>
 											<Typography
 												className={clsx(
@@ -314,7 +339,7 @@ function CouponsTable(props: CouponsTableProps) {
 											align="center"
 										>
 											<div className='flex flex-1 justify-center'>
-												{n.status ? (
+												{n?.closedAt === undefined ? (
 													<FuseSvgIcon
 														className="text-green"
 														size={20}

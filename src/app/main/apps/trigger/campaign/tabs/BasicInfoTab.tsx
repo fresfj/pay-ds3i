@@ -9,7 +9,7 @@ import Tooltip from '@mui/material/Tooltip';
 import Avatar from '@mui/material/Avatar';
 import clsx from 'clsx';
 import _ from '@lodash';
-import { SyntheticEvent, useCallback, useState } from 'react';
+import { SyntheticEvent, useCallback, useEffect, useState } from 'react';
 import Checkbox from '@mui/material/Checkbox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
@@ -25,6 +25,31 @@ import Button from '@mui/material/Button';
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
+
+const allowedTypes = [
+	"image/jpeg",
+	"image/png",
+	"image/gif",
+	"image/webp",
+	"video/mp4",
+	"video/quicktime",
+	"audio/mpeg",
+	"audio/aac",
+	"audio/ogg",
+	"audio/wav",
+	"application/pdf",
+	"application/msword",
+	"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+	"application/vnd.ms-excel",
+	"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+	"text/csv",
+	"text/plain"
+];
+
+const maxFileSize = (type) => {
+	const fileTypes = ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "text/csv", "text/plain"];
+	return fileTypes.includes(type) ? 100 * 1024 * 1024 : 16 * 1024 * 1024;
+};
 
 const removeDuplicates = (contacts) => {
 	const seen = new Set();
@@ -47,39 +72,17 @@ function BasicInfoTab() {
 		{ instanceId: user.customer.id },
 		{ skip: !user.customer.id }) as any;
 	const { data: contactGroup, isLoading: isContactsLoading } = useGetContactsQuery();
-	const openInstances = instances?.filter(instance => instance.connectionStatus === "open");
-
 	const [file, setFile] = useState<File | null>(null);
-
 	const [uploading, setUploading] = useState(false);
 	const [message, setMessage] = useState('');
 
-	const allowedTypes = [
-		"image/jpeg",
-		"image/png",
-		"image/gif",
-		"image/webp",
-		"video/mp4",
-		"video/quicktime",
-		"audio/mpeg",
-		"audio/aac",
-		"audio/ogg",
-		"audio/wav",
-		"application/pdf",
-		"application/msword",
-		"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-		"application/vnd.ms-excel",
-		"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-		"text/csv",
-		"text/plain"
-	];
+	if (isInstancesLoading || isContactsLoading) {
+		return <FuseLoading />;
+	}
 
-	const maxFileSize = (type) => {
-		const fileTypes = ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "text/csv", "text/plain"];
-		return fileTypes.includes(type) ? 100 * 1024 * 1024 : 16 * 1024 * 1024;
-	};
+	const openInstances = instances?.filter(instance => instance.connectionStatus === "open");
 
-	const handleDropSingleFile = useCallback((acceptedFiles: File[]) => {
+	const handleDropSingleFile = (acceptedFiles: File[]) => {
 		const newFile = acceptedFiles[0];
 
 		if (!allowedTypes.includes(newFile.type)) {
@@ -116,11 +119,7 @@ function BasicInfoTab() {
 		};
 		reader.readAsDataURL(newFile);
 
-	}, []);
-
-	if (isInstancesLoading || isContactsLoading) {
-		return <FuseLoading />;
-	}
+	};
 
 	const handleUpload = async () => {
 		try {
@@ -215,7 +214,7 @@ function BasicInfoTab() {
 							multiple
 							freeSolo
 							options={openInstances || []}
-							value={cardForm?.instanceIds?.map((id) => _.find(openInstances, { id }))}
+							value={value?.map(id => openInstances.find(instance => instance.id === id) || null) || []}
 							getOptionLabel={(instances: string | ScrumboardMember) => {
 								return typeof instances === 'string' ? instances : instances?.name;
 							}}
@@ -295,68 +294,75 @@ function BasicInfoTab() {
 					<Iconify icon="solar:users-group-rounded-bold-duotone" width={20} />
 					<Typography className="font-semibold text-16 mx-8">Grupo de Contato</Typography>
 				</div>
-				<Autocomplete
-					className="mt-8 mb-16"
-					multiple
-					freeSolo
-					options={contactGroup || []}
-					getOptionLabel={(contacts: string | ScrumboardMember) => {
-						return typeof contacts === 'string' ? contacts : contacts?.name;
-					}}
-					value={cardForm?.contactIds?.map((id) => _.find(contactGroup, { id }))}
-					renderOption={(props, contact: any, { selected }) => (
-						<li {...props}>
-							<Checkbox
-								icon={icon}
-								checkedIcon={checkedIcon}
-								style={{ marginRight: 8 }}
-								checked={selected}
-							/>
-							<>
-								<Typography className="flex-1 text-16 font-medium">
-									{contact?.name}
-									<Typography className='text-12' color='inherit'>
-										Esse grupo tem <strong>{contact?.contacts.length}</strong> contatos
-									</Typography>
-								</Typography>
-							</>
-						</li>
-					)}
-					onChange={(event: SyntheticEvent<Element, Event>, value: (string | ScrumboardMember)[]) => {
-						const ids = value
-							.filter((item): item is ScrumboardMember => typeof item !== 'string')
-							.map((item) => item.id);
-						const combinedContacts = getCombinedContacts(ids);
-						setValue('contacts', combinedContacts)
-						setValue('contactIds', ids);
-					}}
-					renderTags={(value, getTagProps) =>
-						value.map((option, index) => {
-							if (typeof option === 'string') {
-								return <span />;
-							}
-
-							return (
-								<Chip
-									label={option.name}
-									{...getTagProps({ index })}
-									className={clsx('m-3', option?.class)}
-								/>
-							);
-						})
-					}
-					renderInput={(params) => (
-						<TextField
-							{...params}
-							placeholder="Select multiple Contacts"
-							label="Contacts"
-							variant="outlined"
-							InputLabelProps={{
-								shrink: true
+				<Controller
+					control={control}
+					name="contactIds"
+					render={({ field: { onChange, value } }) => (
+						<Autocomplete
+							className="mt-8 mb-16"
+							multiple
+							freeSolo
+							options={contactGroup || []}
+							getOptionLabel={(contacts: string | ScrumboardMember) => {
+								return typeof contacts === 'string' ? contacts : contacts?.name;
 							}}
+							value={value?.map(id => contactGroup.find(group => group.id === id) || null) || []}
+							renderOption={(props, contact: any, { selected }) => (
+								<li {...props}>
+									<Checkbox
+										icon={icon}
+										checkedIcon={checkedIcon}
+										style={{ marginRight: 8 }}
+										checked={selected}
+									/>
+									<>
+										<Typography className="flex-1 text-16 font-medium">
+											{contact?.name}
+											<Typography className='text-12' color='inherit'>
+												Esse grupo tem <strong>{contact?.contacts.length}</strong> contatos
+											</Typography>
+										</Typography>
+									</>
+								</li>
+							)}
+							onChange={(event: SyntheticEvent<Element, Event>, value: (string | ScrumboardMember)[]) => {
+								const ids = value
+									.filter((item): item is ScrumboardMember => typeof item !== 'string')
+									.map((item) => item.id);
+								const combinedContacts = getCombinedContacts(ids);
+								setValue('contacts', combinedContacts)
+								setValue('contactIds', ids);
+							}}
+							renderTags={(value, getTagProps) =>
+								value.map((option, index) => {
+									if (typeof option === 'string') {
+										return <span />;
+									}
+
+									return (
+										<Chip
+											label={option.name}
+											{...getTagProps({ index })}
+											className={clsx('m-3', option?.class)}
+										/>
+									);
+								})
+							}
+							renderInput={(params) => (
+								<TextField
+									{...params}
+									placeholder="Select multiple Contacts"
+									label="Contacts"
+									variant="outlined"
+									InputLabelProps={{
+										shrink: true
+									}}
+								/>
+							)}
 						/>
 					)}
 				/>
+
 			</div>
 
 			<div className="flex-1 mb-24">
@@ -394,6 +400,7 @@ function BasicInfoTab() {
 					</>
 				}
 			</div>
+
 			<Controller
 				name="conversation"
 				control={control}

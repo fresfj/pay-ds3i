@@ -190,8 +190,10 @@ function CouponsTable(props: CouponsTableProps) {
 											scope="row"
 											align="right"
 										>
-											<Iconify icon="solar:users-group-rounded-bold-duotone" width={22} sx={{ mr: 1 }} />
-											{n.contacts?.length}
+											<Typography className='text-lg font-semibold'>
+												<Iconify icon="solar:users-group-rounded-bold-duotone" width={32} sx={{ mr: 1 }} />
+												{n.contacts?.length}
+											</Typography>
 										</TableCell>
 
 										<TableCell

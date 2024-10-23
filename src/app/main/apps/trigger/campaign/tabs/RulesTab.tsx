@@ -4,15 +4,19 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { Typography, Grid, Autocomplete, Button } from '@mui/material';
 import { Iconify } from '@fuse/components/iconify';
 import _ from '@lodash';
+import { addMinutes, format, isBefore, setHours, setMinutes } from 'date-fns';
+import { useEffect, useState } from 'react';
 
 const generateSecondsOptions = () => {
-	return Array.from({ length: 60 }, (_, index) => ({
-		value: index + 1,
-		label: `${index + 1} seconds`
-	}));
+	return Array.from({ length: 12 }, (_, index) => ({
+		value: ((index + 3) * 5),
+		label: `${((index + 3) * 5)} seconds`
+	}))
 }
 
 const options = generateSecondsOptions();
+const now = new Date();
+const minDate = new Date(now.getTime() + 30 * 60 * 1000);
 
 const timeSlots = Array.from(new Array(24)).map(
 	(_, index) => `${index < 10 ? '0' : ''}${index}:00`);
@@ -49,6 +53,56 @@ function RulesTab() {
 		setValue('special', oddHours);
 	};
 
+	const cardForm = watch();
+
+	const startDate = cardForm.startDate
+	const intervalMin = cardForm.intervalMin
+	const contacts = cardForm.contacts
+	const allowedTimes = cardForm.special
+
+	const [finalizationDate, setFinalizationDate] = useState<Date | null>(null);
+	const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+	// useEffect(() => {
+
+	// 	if (startDate && intervalMin && contacts?.length) {
+	// 		const formattedTime = format(new Date(startDate), 'HH:mm');
+
+	// 		// Verificar se o horário está dentro dos horários permitidos
+	// 		if (allowedTimes.length > 0 && !allowedTimes.includes(formattedTime)) {
+	// 			setErrorMessage(`O disparo não pode ser feito fora dos horários permitidos: ${allowedTimes.join(', ')}.`);
+	// 			setFinalizationDate(null);
+	// 			return;
+	// 		}
+
+	// 		// Cálculo do tempo total
+	// 		let totalTimeInMinutes = contacts.length * intervalMin;
+	// 		let currentTime = new Date(startDate);
+	// 		let remainingTimeInMinutes = totalTimeInMinutes;
+
+	// 		// Ajustar o horário de término dentro dos horários permitidos
+	// 		while (remainingTimeInMinutes > 0) {
+	// 			const currentHourMinute = format(currentTime, 'HH:mm');
+
+	// 			if (!allowedTimes.includes(currentHourMinute)) {
+	// 				const nextAllowedTime = allowedTimes.find(time => isBefore(currentTime, setHours(setMinutes(new Date(currentTime), parseInt(time.split(':')[1])), parseInt(time.split(':')[0]))));
+	// 				if (nextAllowedTime) {
+	// 					currentTime = setHours(setMinutes(currentTime, parseInt(nextAllowedTime.split(':')[1])), parseInt(nextAllowedTime.split(':')[0]));
+	// 				} else {
+	// 					currentTime = addMinutes(currentTime, 60);
+	// 				}
+	// 				continue;
+	// 			}
+
+	// 			remainingTimeInMinutes -= 1;
+	// 			currentTime = addMinutes(currentTime, 1);
+	// 		}
+
+	// 		setFinalizationDate(currentTime);
+	// 		setErrorMessage(null);
+	// 	}
+	// }, [startDate, intervalMin, contacts, allowedTimes]);
+
 	return (
 		<div>
 			<Controller
@@ -59,6 +113,8 @@ function RulesTab() {
 						format='dd/MM/yyyy HH:mm:ss'
 						className="mt-8 mb-16 w-full"
 						value={new Date(value) || null}
+						minDate={new Date()}
+						minTime={minDate}
 						onChange={onChange}
 						slotProps={{
 							textField: {
@@ -71,6 +127,13 @@ function RulesTab() {
 					/>
 				)}
 			/>
+			<div>
+				{finalizationDate ? (
+					<p>Previsão de finalização do disparo: {finalizationDate.toLocaleString()}</p>
+				) : (
+					<p>Por favor, preencha os dados para calcular a previsão de finalização.</p>
+				)}
+			</div>
 
 			<div className="flex flex-column sm:flex-row w-full items-center space-x-16">
 				<Grid container spacing={2} className='mt-8 mb-16'>

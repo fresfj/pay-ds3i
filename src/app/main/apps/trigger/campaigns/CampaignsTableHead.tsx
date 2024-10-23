@@ -53,8 +53,15 @@ const rows: rowType[] = [
 		sort: true
 	},
 	{
+		id: 'attachment',
+		align: 'center',
+		disablePadding: false,
+		label: 'Anexo',
+		sort: true
+	},
+	{
 		id: 'status',
-		align: 'right',
+		align: 'center',
 		disablePadding: false,
 		label: 'Status',
 		sort: true
