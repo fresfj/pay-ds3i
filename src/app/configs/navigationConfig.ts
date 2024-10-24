@@ -88,6 +88,14 @@ const navigationConfig: FuseNavItemType[] = [
         translate: 'CALENDAR'
       },
       {
+        id: 'apps.messenger',
+        title: 'Messenger',
+        type: 'item',
+        icon: 'solar:chat-line-line-duotone',
+        url: '/apps/messenger',
+        translate: 'MESSENGER'
+      },
+      {
         id: 'apps.quiz',
         title: 'Quiz',
         type: 'item',
@@ -230,22 +238,6 @@ const navigationConfig: FuseNavItemType[] = [
         icon: 'solar:settings-bold-duotone',
         translate: 'SETTINGS',
         children: [
-          {
-            id: 'sms',
-            title: 'SMS',
-            translate: 'SMS',
-            type: 'item',
-            url: 'apps/settings/sms',
-            end: true
-          },
-          {
-            id: 'emails',
-            title: 'Emails',
-            translate: 'EMAILS',
-            type: 'item',
-            url: 'apps/settings/emails',
-            end: true
-          },
           {
             id: 'instagram',
             title: 'Instagram',

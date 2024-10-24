@@ -55,6 +55,7 @@ function Campaign() {
 
 
 	const [tabValue, setTabValue] = useState(0);
+	const [blockedForm, setBlockedForm] = useState(false);
 
 	const methods = useForm({
 		mode: 'onChange',
@@ -81,6 +82,9 @@ function Campaign() {
 
 	useEffect(() => {
 		if (campaign) {
+			if (campaign?.closedAt !== undefined && campaign?.status === 'COMPLETED') {
+				setBlockedForm(true)
+			}
 			reset({ ...campaign });
 		}
 	}, [campaign, reset]);
@@ -125,6 +129,8 @@ function Campaign() {
 		);
 	}
 
+
+
 	/**
 	 * Wait while coupon data is loading and form is setted
 	 */
@@ -136,7 +142,7 @@ function Campaign() {
 	return (
 		<FormProvider {...methods}>
 			<FusePageCarded
-				header={<CouponHeader />}
+				header={<CouponHeader onBlocked={blockedForm} />}
 				content={
 					<>
 						<Tabs
@@ -165,10 +171,10 @@ function Campaign() {
 						</Tabs>
 						<div className={`p-16 sm:p-24 ${tabValue !== 2 ? 'max-w-3xl' : ''}`}>
 							<div className={tabValue !== 0 ? 'hidden' : ''}>
-								<BasicInfoTab />
+								<BasicInfoTab onBlocked={blockedForm} />
 							</div>
 							<div className={tabValue !== 1 ? 'hidden' : ''}>
-								<RulesTab />
+								<RulesTab onBlocked={blockedForm} />
 							</div>
 							<div className={tabValue !== 2 ? 'hidden' : ''}>
 								<ReportTab />

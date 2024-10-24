@@ -199,7 +199,6 @@ function CouponsTable(props: CouponsTableProps) {
 									percentages: 0
 								}
 
-								console.log(n)
 								return (
 									<TableRow
 										className="h-72 cursor-pointer"

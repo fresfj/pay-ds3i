@@ -21,6 +21,7 @@ import {
 	useGetMessengerUserProfileQuery,
 	useSendMessengerMessageMutation
 } from '../MessengerApi';
+import axios from 'axios';
 
 const StyledMessageRow = styled('div')(({ theme }) => ({
 	'&.contact': {
@@ -99,6 +100,8 @@ const StyledMessageRow = styled('div')(({ theme }) => ({
 type ChatPropsType = {
 	className?: string;
 };
+const API_URL = 'https://evolution.richeli.dev/message/sendText/{instance}';
+const API_KEY = '92008D8711AD-4DCE-9525-6BA7D006B937';
 
 /**
  * The Chat App.
@@ -150,13 +153,41 @@ function Chat(props: ChatPropsType) {
 		setMessage(ev.target.value);
 	}
 
+	const handleSendMessage = async () => {
+		if (message.trim() === '') return;
+
+		const messageData = {
+			number: '554199601055',
+			text: message,
+			delay: 1800,
+		};
+
+
+		const options = {
+			method: 'POST',
+			headers: {
+				apikey: API_KEY,
+				'Content-Type': 'application/json',
+			},
+			data: messageData,
+			url: API_URL.replace('{instance}', 'Francisco'),
+		};
+
+		try {
+			const response = await axios(options);
+			return response.data;
+		} catch (error) {
+			console.error('Erro ao enviar a mensagem:', error);
+			throw error;
+		}
+	}
 	function onMessageSubmit(ev: React.FormEvent<HTMLFormElement>) {
 		ev.preventDefault();
 
 		if (message === '') {
 			return;
 		}
-
+		handleSendMessage()
 		sendMessage({
 			message,
 			contactId

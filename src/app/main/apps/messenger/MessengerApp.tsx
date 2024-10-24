@@ -7,6 +7,10 @@ import useThemeMediaQuery from '@fuse/hooks/useThemeMediaQuery';
 import MainSidebar from './sidebars/main/MainSidebar';
 import ContactSidebar from './sidebars/contact/ContactSidebar';
 import UserSidebar from './sidebars/user/UserSidebar';
+import { initSocket } from './messengerPanel/useChatWebSocket';
+import withReducer from 'app/store/withReducer';
+import reducer from './messengerPanel/store';
+import { useAppDispatch } from 'app/store/store';
 
 const drawerWidth = 400;
 
@@ -17,9 +21,9 @@ type ChatAppContextType = {
 };
 
 export const ChatAppContext = createContext<ChatAppContextType>({
-	setMainSidebarOpen: () => {},
-	setContactSidebarOpen: () => {},
-	setUserSidebarOpen: () => {}
+	setMainSidebarOpen: () => { },
+	setContactSidebarOpen: () => { },
+	setUserSidebarOpen: () => { }
 });
 
 const Root = styled(FusePageSimple)(() => ({
@@ -49,9 +53,24 @@ function MessengerApp() {
 	const location = useLocation();
 	const isMobile = useThemeMediaQuery((theme) => theme.breakpoints.down('lg'));
 
+
 	const [mainSidebarOpen, setMainSidebarOpen] = useState(!isMobile);
 	const [contactSidebarOpen, setContactSidebarOpen] = useState(false);
 	const [userSidebarOpen, setUserSidebarOpen] = useState(false);
+
+	const dispatch = useAppDispatch();
+	useEffect(() => {
+		const ws = initSocket(dispatch, 'Francisco');
+		console.log('WebSocket initialized', ws);
+		ws.emit("MESSAGES_UPSERT", "world")
+
+		ws.emit('send_message', { message: 'Olá, Mundo!' })
+
+		return () => {
+			ws.disconnect();
+		};
+	}, [dispatch]);
+
 
 	useEffect(() => {
 		setMainSidebarOpen(!isMobile);
@@ -101,7 +120,7 @@ function MessengerApp() {
 				variant="temporary"
 				anchor="left"
 				open={userSidebarOpen}
-				onOpen={() => {}}
+				onOpen={() => { }}
 				onClose={() => setUserSidebarOpen(false)}
 				classes={{
 					paper: 'absolute left-0'
@@ -123,4 +142,4 @@ function MessengerApp() {
 	);
 }
 
-export default MessengerApp;
+export default withReducer('chatPanel', reducer)(MessengerApp);

@@ -16,7 +16,7 @@ import {
 /**
  * The coupon header.
  */
-function CampaignHeader() {
+function CampaignHeader({ ...other }) {
 	const routeParams = useParams();
 	const { triggerId } = routeParams;
 
@@ -122,7 +122,7 @@ function CampaignHeader() {
 						className="whitespace-nowrap mx-4"
 						variant="contained"
 						color="secondary"
-						disabled={_.isEmpty(dirtyFields) || !isValid}
+						disabled={_.isEmpty(dirtyFields) || !isValid || other?.onBlocked}
 						onClick={handleCreateCoupon}
 					>
 						Add

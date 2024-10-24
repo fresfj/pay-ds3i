@@ -62,7 +62,7 @@ const removeDuplicates = (contacts) => {
 /**
  * The basic info tab.
  */
-function BasicInfoTab() {
+function BasicInfoTab({ ...other }) {
 	const methods = useFormContext();
 	const { control, formState, watch, setValue } = methods;
 	const { errors } = formState;
@@ -174,6 +174,7 @@ function BasicInfoTab() {
 						id="name"
 						variant="outlined"
 						fullWidth
+						disabled={other?.onBlocked}
 						error={!!errors.name}
 						helperText={errors?.name?.message as string}
 					/>
@@ -190,6 +191,7 @@ function BasicInfoTab() {
 						id="description"
 						label="Descrição"
 						required
+						disabled={other?.onBlocked}
 						error={!!errors.description}
 						helperText={errors?.description?.message as string}
 						type="text"
@@ -213,6 +215,7 @@ function BasicInfoTab() {
 							className="mt-8 mb-16"
 							multiple
 							freeSolo
+							disabled={other?.onBlocked}
 							options={openInstances || []}
 							value={value?.map(id => openInstances.find(instance => instance.id === id) || null) || []}
 							getOptionLabel={(instances: string | ScrumboardMember) => {
@@ -302,6 +305,7 @@ function BasicInfoTab() {
 							className="mt-8 mb-16"
 							multiple
 							freeSolo
+							disabled={other?.onBlocked}
 							options={contactGroup || []}
 							getOptionLabel={(contacts: string | ScrumboardMember) => {
 								return typeof contacts === 'string' ? contacts : contacts?.name;
@@ -374,6 +378,7 @@ function BasicInfoTab() {
 					value={file || cardForm?.publicUrl}
 					onDrop={handleDropSingleFile}
 					onDelete={() => setFile(null)}
+					disabled={other?.onBlocked}
 					placeholder={
 						<Stack spacing={0.5} alignItems="center">
 							<Iconify icon="solar:file-send-bold-duotone" width={48} />
@@ -411,6 +416,7 @@ function BasicInfoTab() {
 						id="conversation"
 						label="Message"
 						required
+						disabled={other?.onBlocked}
 						error={!!errors.conversation}
 						helperText={errors?.conversation?.message as string}
 						type="text"

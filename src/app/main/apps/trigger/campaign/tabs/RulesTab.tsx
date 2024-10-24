@@ -23,7 +23,7 @@ const timeSlots = Array.from(new Array(24)).map(
 /**
  * The shipping tab.
  */
-function RulesTab() {
+function RulesTab({ ...other }) {
 	const methods = useFormContext();
 	const { control, watch, formState: { errors }, setValue } = methods;
 
@@ -112,6 +112,7 @@ function RulesTab() {
 					<DateTimePicker
 						format='dd/MM/yyyy HH:mm:ss'
 						className="mt-8 mb-16 w-full"
+						disabled={other?.onBlocked}
 						value={new Date(value) || null}
 						minDate={new Date()}
 						minTime={minDate}
@@ -149,6 +150,7 @@ function RulesTab() {
 									}}
 									id="intervalMin"
 									options={options}
+									disabled={other?.onBlocked}
 									getOptionLabel={(option) => option.label}
 									renderInput={(params) => (
 										<TextField
@@ -178,6 +180,7 @@ function RulesTab() {
 									}}
 									id="intervalMax"
 									options={options}
+									disabled={other?.onBlocked}
 									getOptionLabel={(option) => option.label}
 									renderInput={(params) => (
 										<TextField
@@ -217,6 +220,7 @@ function RulesTab() {
 							className="mt-8 mb-16"
 							multiple
 							freeSolo
+							disabled={other?.onBlocked}
 							options={timeSlots}
 							value={value || ''}
 							onChange={(event, newValue) => {

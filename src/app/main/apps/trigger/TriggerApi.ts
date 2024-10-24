@@ -183,7 +183,8 @@ export type EcommerceCoupon = {
   name?: string
   description: string
   quantity: number
-  status?: boolean
+  status?: string
+  closedAt?: string
   amount?: {
     applied: string
     type: boolean

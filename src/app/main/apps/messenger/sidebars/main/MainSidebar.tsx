@@ -113,9 +113,9 @@ function MainSidebar() {
 						const chatListContacts =
 							contacts?.length > 0 && chats?.length > 0
 								? chats.map((_chat) => ({
-										..._chat,
-										...contacts.find((_contact) => _contact.id === _chat.contactId)
-									}))
+									..._chat,
+									...contacts.find((_contact) => _contact.id === _chat.id)
+								}))
 								: [];
 
 						const filteredContacts = getFilteredArray([...contacts], searchText);
@@ -153,7 +153,7 @@ function MainSidebar() {
 									</motion.div>
 								)}
 
-								{filteredChatList.map((chat, index) => (
+								{filteredChatList.slice(0, 50).map((chat, index) => (
 									<motion.div
 										variants={item}
 										key={chat.id}
@@ -175,7 +175,7 @@ function MainSidebar() {
 									</motion.div>
 								)}
 
-								{filteredContacts.map((contact, index) => (
+								{filteredContacts.slice(0, 50).map((contact, index) => (
 									<motion.div
 										variants={item}
 										key={contact.id}
